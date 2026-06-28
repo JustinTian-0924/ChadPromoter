@@ -14,3 +14,42 @@ use-failed-own-code: "&cYou cannot use your own Promotion Code."
 use-failed-already-used: "&cYou have already used a Promotion Code."
 use-failed-code-not-found: "&cThat Promotion Code does not exist."
 use-failed-not-new-player: "&cYou are no longer considered a new player."
+
+gui:
+  title: "&8ChadPromoter"
+  my-code-name: "&aYour Promotion Code"
+  my-code-lore:
+    - "&7Your code is:"
+    - "&e%code%"
+    - ""
+    - "&7Share it with new players!"
+  invited-count-name: "&bInvite Stats"
+  invited-count-lore:
+    - "&7You have invited &e%count% &7player(s)."
+  used-code-name: "&dBind Status"
+  used-code-none-lore:
+    - "&7You have not used another player's code."
+    - "&7Use: &e/cpromoter use <code>"
+  used-code-exists-lore:
+    - "&7You have already used code:"
+    - "&e%code%"
+  help-name: "&eHelp"
+  help-lore:
+    - "&7/cpromoter"
+    - "&fOpen this panel"
+    - ""
+    - "&7/cpromoter use <code>"
+    - "&fBind another player's Promotion Code"
+  promoted-list-title: "&8Invited Players Page %page%"
+  promoted-player-name: "&a%player%"
+  promoted-player-lore:
+    - "&7UUID:"
+    - "&f%uuid%"
+    - ""
+    - "&7Reward status will be shown here later."
+  no-promoted-players-name: "&cNo Invited Players"
+  no-promoted-players-lore:
+    - "&7No player has used your Promotion Code yet."
+  previous-page-name: "&ePrevious Page"
+  next-page-name: "&eNext Page"
+  back-name: "&cBack to Main Menu"

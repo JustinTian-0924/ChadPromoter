@@ -6,6 +6,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -114,5 +116,41 @@ public class DataManager {
 		playersData.set(path + ".promoted-by", promoterUuid.toString());
 
 		savePlayersData();
+	}
+
+	public String getUsedCode(UUID playerUuid) {
+		return playersData.getString("players." + playerUuid + ".used-code");
+	}
+
+	public int getPromotedPlayerCount(UUID promoterUuid) {
+		Set<String> playerUuids = playersData.getConfigurationSection("players") == null
+				? Set.of()
+				: playersData.getConfigurationSection("players").getKeys(false);
+
+		int count = 0;
+
+		for (String playerUuid : playerUuids) {
+			String promotedBy = playersData.getString("players." + playerUuid + ".promoted-by");
+
+			if (promoterUuid.toString().equals(promotedBy)) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	public List<UUID> getPromotedPlayerUuids(UUID promoterUuid) {
+		Set<String> playerUuids = playersData.getConfigurationSection("players") == null
+				? Set.of()
+				: playersData.getConfigurationSection("players").getKeys(false);
+		List<UUID> promotedPlayers = new ArrayList<>();
+		for (String playerUuid : playerUuids) {
+			String promotedBy = playersData.getString("players." + playerUuid + ".promoted-by");
+			if (promoterUuid.toString().equals(promotedBy)) {
+				promotedPlayers.add(UUID.fromString(playerUuid));
+			}
+		}
+		return promotedPlayers;
 	}
 }

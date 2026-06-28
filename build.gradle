@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'basementhost.randomchad.chadpromoter'
-version = '0.0.2'
+version = '0.0.3'
 
 repositories {
     mavenCentral()

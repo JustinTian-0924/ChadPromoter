@@ -2,8 +2,10 @@ package basementhost.randomchad;
 
 import basementhost.randomchad.command.ChadPromoterCommand;
 import basementhost.randomchad.lang.LangManager;
+import basementhost.randomchad.listener.GuiClickListener;
 import basementhost.randomchad.listener.PlayerJoinListener;
 import basementhost.randomchad.manager.DataManager;
+import basementhost.randomchad.manager.GuiManager;
 import basementhost.randomchad.manager.PromoteManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -15,6 +17,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private PromoteManager promoteManager;
 	private LangManager langManager;
 	private Economy economy;
+	private GuiManager guiManager;
 
 	@Override
 	public void onEnable() {
@@ -23,6 +26,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		this.langManager = new LangManager(this);
 		this.dataManager = new DataManager(this);
 		this.promoteManager = new PromoteManager(this, dataManager);
+		this.guiManager = new GuiManager(dataManager, promoteManager, langManager);
 
 		setupVaultEconomy();
 		registerListeners();
@@ -45,10 +49,15 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				new PlayerJoinListener(dataManager, promoteManager, langManager),
 				this
 		);
+
+		getServer().getPluginManager().registerEvents(
+				new GuiClickListener(guiManager),
+				this
+		);
 	}
 
 	private void registerCommands() {
-		ChadPromoterCommand command = new ChadPromoterCommand(promoteManager, langManager);
+		ChadPromoterCommand command = new ChadPromoterCommand(promoteManager, langManager, guiManager);
 
 		if (getCommand("chadpromoter") != null) {
 			getCommand("chadpromoter").setExecutor(command);
@@ -89,5 +98,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public Economy getEconomy() {
 		return economy;
+	}
+
+	public GuiManager getGuiManager() {
+		return guiManager;
 	}
 }

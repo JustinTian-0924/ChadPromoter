@@ -1,5 +1,5 @@
 name: ChadPromoter
-version: 0.0.2
+version: 0.0.3
 main: basementhost.randomchad.ChadPromoterPlugin
 api-version: '26.1.2'
 description: Promoter plugin

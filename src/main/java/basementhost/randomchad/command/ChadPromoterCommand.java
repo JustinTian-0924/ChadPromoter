@@ -1,6 +1,7 @@
 package basementhost.randomchad.command;
 
 import basementhost.randomchad.lang.LangManager;
+import basementhost.randomchad.manager.GuiManager;
 import basementhost.randomchad.manager.PromoteManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,10 +15,12 @@ public class ChadPromoterCommand implements TabExecutor {
 
 	private final PromoteManager promoteManager;
 	private final LangManager langManager;
+	private final GuiManager guiManager;
 
-	public ChadPromoterCommand(PromoteManager promoteManager, LangManager langManager) {
+	public ChadPromoterCommand(PromoteManager promoteManager, LangManager langManager, GuiManager guiManager) {
 		this.promoteManager = promoteManager;
 		this.langManager = langManager;
+		this.guiManager = guiManager;
 	}
 
 	@Override
@@ -28,9 +31,7 @@ public class ChadPromoterCommand implements TabExecutor {
 		}
 
 		if (args.length == 0) {
-			String code = promoteManager.getOrCreatePromoteCode(player);
-			langManager.sendMessage(player, "code-view", Map.of("%code%", code));
-			langManager.sendMessageList(player, "usage");
+			guiManager.openMainGui(player);
 			return true;
 		}
 

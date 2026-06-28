@@ -5,18 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="030c91b8-a5c7-4d5a-82c9-3bed1c9af51f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/command/ChadPromoterCommand.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/lang/LangManager.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/lang/en_us.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/lang/zh_cn.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/gui/ChadPromoterGuiHolder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/listener/GuiClickListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/manager/GuiManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/ChadPromoterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/ChadPromoterPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/listener/PlayerJoinListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/listener/PlayerJoinListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/command/ChadPromoterCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/command/ChadPromoterCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/lang/LangManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/lang/LangManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/manager/DataManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/manager/DataManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/manager/PromoteManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/basementhost/randomchad/manager/PromoteManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/lang/en_us.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/lang/en_us.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/lang/zh_cn.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/lang/zh_cn.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/plugin.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

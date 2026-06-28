@@ -14,3 +14,42 @@ use-failed-own-code: "&c你不能使用自己的 Promotion Code。"
 use-failed-already-used: "&c你已经使用过 Promotion Code，不能重复绑定。"
 use-failed-code-not-found: "&c找不到这个 Promotion Code。"
 use-failed-not-new-player: "&c你已经不属于新玩家，不能再使用 Promotion Code。"
+
+gui:
+  title: "&8ChadPromoter"
+  my-code-name: "&a你的 Promotion Code"
+  my-code-lore:
+    - "&7你的邀请码是:"
+    - "&e%code%"
+    - ""
+    - "&7把它分享给新玩家吧！"
+  invited-count-name: "&b邀请统计"
+  invited-count-lore:
+    - "&7你已经邀请了 &e%count% &7名玩家。"
+  used-code-name: "&d绑定状态"
+  used-code-none-lore:
+    - "&7你还没有使用过其他玩家的邀请码。"
+    - "&7使用: &e/cpromoter use <code>"
+  used-code-exists-lore:
+    - "&7你已经使用过邀请码:"
+    - "&e%code%"
+  help-name: "&e使用帮助"
+  help-lore:
+    - "&7/cpromoter"
+    - "&f打开这个面板"
+    - ""
+    - "&7/cpromoter use <code>"
+    - "&f绑定其他玩家的邀请码"
+  promoted-list-title: "&8被邀请玩家列表 第 %page% 页"
+  promoted-player-name: "&a%player%"
+  promoted-player-lore:
+    - "&7UUID:"
+    - "&f%uuid%"
+    - ""
+    - "&7之后这里会显示奖励领取状态。"
+  no-promoted-players-name: "&c暂无邀请记录"
+  no-promoted-players-lore:
+    - "&7还没有玩家使用你的 Promotion Code。"
+  previous-page-name: "&e上一页"
+  next-page-name: "&e下一页"
+  back-name: "&c返回主菜单"

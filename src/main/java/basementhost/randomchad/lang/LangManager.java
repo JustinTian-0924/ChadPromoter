@@ -74,4 +74,28 @@ public class LangManager {
 	private String color(String message) {
 		return ChatColor.translateAlternateColorCodes('&', message);
 	}
+
+	public String getRawMessage(String path) {
+		return color(lang.getString(path, path));
+	}
+
+	public String getRawMessage(String path, Map<String, String> placeholders) {
+		String message = getRawMessage(path);
+		for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+			message = message.replace(entry.getKey(), entry.getValue());
+		}
+		return message;
+	}
+
+	public List<String> getRawMessageList(String path, Map<String, String> placeholders) {
+		List<String> messages = lang.getStringList(path);
+		return messages.stream()
+				.map(message -> {
+					for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+						message = message.replace(entry.getKey(), entry.getValue());
+					}
+					return color(message);
+				})
+				.toList();
+	}
 }
