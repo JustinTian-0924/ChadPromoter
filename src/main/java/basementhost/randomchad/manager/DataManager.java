@@ -59,8 +59,16 @@ public class DataManager {
 		return playersData.contains("players." + playerUuid);
 	}
 
+	public String getPlayerName(UUID playerUuid) {
+		return playersData.getString("players." + playerUuid + ".name", "Unknown");
+	}
+
 	public String getPromoteCode(UUID playerUuid) {
 		return playersData.getString("players." + playerUuid + ".promote-code");
+	}
+
+	public boolean hasUsedCode(UUID playerUuid) {
+		return playersData.getString("players." + playerUuid + ".used-code") != null;
 	}
 
 	public void createPlayer(UUID playerUuid, String playerName, String promoteCode) {
@@ -74,7 +82,16 @@ public class DataManager {
 		savePlayersData();
 	}
 
+	public void updatePlayerName(UUID playerUuid, String playerName) {
+		playersData.set("players." + playerUuid + ".name", playerName);
+		savePlayersData();
+	}
+
 	public boolean isCodeUsed(String code) {
+		return findPlayerUuidByCode(code) != null;
+	}
+
+	public UUID findPlayerUuidByCode(String code) {
 		Set<String> playerUuids = playersData.getConfigurationSection("players") == null
 				? Set.of()
 				: playersData.getConfigurationSection("players").getKeys(false);
@@ -82,11 +99,20 @@ public class DataManager {
 		for (String playerUuid : playerUuids) {
 			String existingCode = playersData.getString("players." + playerUuid + ".promote-code");
 
-			if (code.equalsIgnoreCase(existingCode)) {
-				return true;
+			if (existingCode != null && code.equalsIgnoreCase(existingCode)) {
+				return UUID.fromString(playerUuid);
 			}
 		}
 
-		return false;
+		return null;
+	}
+
+	public void bindPromoter(UUID playerUuid, String usedCode, UUID promoterUuid) {
+		String path = "players." + playerUuid;
+
+		playersData.set(path + ".used-code", usedCode);
+		playersData.set(path + ".promoted-by", promoterUuid.toString());
+
+		savePlayersData();
 	}
 }

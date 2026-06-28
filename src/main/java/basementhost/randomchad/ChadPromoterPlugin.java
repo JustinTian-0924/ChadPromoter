@@ -1,5 +1,7 @@
 package basementhost.randomchad;
 
+import basementhost.randomchad.command.ChadPromoterCommand;
+import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.listener.PlayerJoinListener;
 import basementhost.randomchad.manager.DataManager;
 import basementhost.randomchad.manager.PromoteManager;
@@ -11,21 +13,20 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	private DataManager dataManager;
 	private PromoteManager promoteManager;
+	private LangManager langManager;
 	private Economy economy;
 
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 
+		this.langManager = new LangManager(this);
 		this.dataManager = new DataManager(this);
 		this.promoteManager = new PromoteManager(this, dataManager);
 
 		setupVaultEconomy();
-
-		getServer().getPluginManager().registerEvents(
-				new PlayerJoinListener(this, dataManager, promoteManager),
-				this
-		);
+		registerListeners();
+		registerCommands();
 
 		getLogger().info("ChadPromoter plugin is enabled");
 	}
@@ -37,6 +38,22 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		}
 
 		getLogger().info("ChadPromoter plugin is disabled");
+	}
+
+	private void registerListeners() {
+		getServer().getPluginManager().registerEvents(
+				new PlayerJoinListener(dataManager, promoteManager, langManager),
+				this
+		);
+	}
+
+	private void registerCommands() {
+		ChadPromoterCommand command = new ChadPromoterCommand(promoteManager, langManager);
+
+		if (getCommand("chadpromoter") != null) {
+			getCommand("chadpromoter").setExecutor(command);
+			getCommand("chadpromoter").setTabCompleter(command);
+		}
 	}
 
 	private void setupVaultEconomy() {
@@ -64,6 +81,10 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public PromoteManager getPromoteManager() {
 		return promoteManager;
+	}
+
+	public LangManager getLangManager() {
+		return langManager;
 	}
 
 	public Economy getEconomy() {

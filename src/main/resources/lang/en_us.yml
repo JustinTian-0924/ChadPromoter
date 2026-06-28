@@ -1,0 +1,16 @@
+prefix: "&7[&aChadPromoter&7] "
+
+code-generated: "&aYour Promotion Code has been generated: &e%code%"
+code-existing: "&aYour Promotion Code is: &e%code%"
+code-view: "&aYour Promotion Code is: &e%code%"
+
+player-only: "&cOnly players can use this command."
+usage:
+  - "&e/chadpromoter &7- View your Promotion Code"
+  - "&e/chadpromoter use <code> &7- Use another player's Promotion Code"
+
+use-success: "&aSuccess! You are now recorded as invited by &e%promoter%&a."
+use-failed-own-code: "&cYou cannot use your own Promotion Code."
+use-failed-already-used: "&cYou have already used a Promotion Code."
+use-failed-code-not-found: "&cThat Promotion Code does not exist."
+use-failed-not-new-player: "&cYou are no longer considered a new player."

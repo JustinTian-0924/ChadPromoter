@@ -1,13 +1,8 @@
+language: "en_us"
 new-player-max-playtime-seconds: 3600
-
 code:
   length: 8
   characters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-messages:
-  generated-code: "&aYour Promotion Code is generated as: &e%code%"
-  existing-code: "&a你的 Promotion Code is: &e%code%"
-
 rewards:
   playtime_1h:
     required-playtime-seconds: 3600

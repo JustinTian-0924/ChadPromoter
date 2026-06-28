@@ -1,8 +1,11 @@
 package basementhost.randomchad.manager;
 
 import basementhost.randomchad.util.CodeUtil;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.UUID;
 
 public class PromoteManager {
 
@@ -16,6 +19,7 @@ public class PromoteManager {
 
 	public String getOrCreatePromoteCode(Player player) {
 		if (dataManager.hasPlayer(player.getUniqueId())) {
+			dataManager.updatePlayerName(player.getUniqueId(), player.getName());
 			return dataManager.getPromoteCode(player.getUniqueId());
 		}
 
@@ -28,6 +32,48 @@ public class PromoteManager {
 		);
 
 		return code;
+	}
+
+	public UseCodeResult useCode(Player player, String code) {
+		getOrCreatePromoteCode(player);
+
+		if (!isNewPlayer(player)) {
+			return UseCodeResult.NOT_NEW_PLAYER;
+		}
+
+		if (dataManager.hasUsedCode(player.getUniqueId())) {
+			return UseCodeResult.ALREADY_USED;
+		}
+
+		UUID promoterUuid = dataManager.findPlayerUuidByCode(code);
+
+		if (promoterUuid == null) {
+			return UseCodeResult.CODE_NOT_FOUND;
+		}
+
+		if (promoterUuid.equals(player.getUniqueId())) {
+			return UseCodeResult.OWN_CODE;
+		}
+
+		dataManager.bindPromoter(player.getUniqueId(), code, promoterUuid);
+		return UseCodeResult.SUCCESS;
+	}
+
+	public String getPromoterNameByCode(String code) {
+		UUID promoterUuid = dataManager.findPlayerUuidByCode(code);
+
+		if (promoterUuid == null) {
+			return "Unknown";
+		}
+
+		return dataManager.getPlayerName(promoterUuid);
+	}
+
+	private boolean isNewPlayer(Player player) {
+		int maxPlaytimeSeconds = plugin.getConfig().getInt("new-player-max-playtime-seconds", 3600);
+		int playtimeTicks = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
+
+		return playtimeTicks <= maxPlaytimeSeconds * 20;
 	}
 
 	private String generateUniqueCode() {
@@ -44,5 +90,13 @@ public class PromoteManager {
 		} while (dataManager.isCodeUsed(code));
 
 		return code;
+	}
+
+	public enum UseCodeResult {
+		SUCCESS,
+		OWN_CODE,
+		ALREADY_USED,
+		CODE_NOT_FOUND,
+		NOT_NEW_PLAYER
 	}
 }
