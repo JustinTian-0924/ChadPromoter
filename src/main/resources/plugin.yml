@@ -1,0 +1,16 @@
+name: ChadPromoter
+version: 0.0.1
+main: basementhost.randomchad.ChadPromoterPlugin
+api-version: '26.1.2'
+description: Promoter plugin
+author: Random_Chad
+softdepend:
+  - Vault
+
+commands:
+  chadpromoter:
+    description: Open ChadPromoter panel
+    aliases:
+      - promoter
+      - cpromoter
+    usage: /chadpromoter
