@@ -1,12 +1,15 @@
 package basementhost.randomchad.command;
 
 import basementhost.randomchad.lang.LangManager;
+import basementhost.randomchad.manager.DataManager;
 import basementhost.randomchad.manager.GuiManager;
 import basementhost.randomchad.manager.PromoteManager;
+import basementhost.randomchad.playtime.PlaytimeManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.Map;
@@ -16,15 +19,40 @@ public class ChadPromoterCommand implements TabExecutor {
 	private final PromoteManager promoteManager;
 	private final LangManager langManager;
 	private final GuiManager guiManager;
+	private final JavaPlugin plugin;
+	private final PlaytimeManager playtimeManager;
+	private final DataManager dataManager;
 
-	public ChadPromoterCommand(PromoteManager promoteManager, LangManager langManager, GuiManager guiManager) {
+	public ChadPromoterCommand(
+			JavaPlugin plugin,
+			PromoteManager promoteManager,
+			LangManager langManager,
+			GuiManager guiManager,
+			PlaytimeManager playtimeManager,
+			DataManager dataManager
+	) {
+		this.plugin = plugin;
 		this.promoteManager = promoteManager;
 		this.langManager = langManager;
 		this.guiManager = guiManager;
+		this.playtimeManager = playtimeManager;
+		this.dataManager = dataManager;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+			if (!sender.hasPermission("chadpromoter.reload")) {
+				langManager.sendMessage(sender, "reload-no-permission");
+				return true;
+			}
+			plugin.reloadConfig();
+			langManager.reload();
+			dataManager.loadPlayersData();
+			playtimeManager.reload();
+			langManager.sendMessage(sender, "reload-success");
+			return true;
+		}
 		if (!(sender instanceof Player player)) {
 			langManager.sendMessage(sender, "player-only");
 			return true;
@@ -61,9 +89,11 @@ public class ChadPromoterCommand implements TabExecutor {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		if (args.length == 1) {
+			if (sender.hasPermission("chadpromoter.reload")) {
+				return List.of("use", "reload");
+			}
 			return List.of("use");
 		}
-
 		return List.of();
 	}
 }

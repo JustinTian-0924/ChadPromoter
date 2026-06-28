@@ -1,4 +1,7 @@
-language: "en_us"
+language: "zh_cn"
+playtime:
+  source: "internal"
+  fallback-to-internal: true
 new-player-max-playtime-seconds: 3600
 code:
   length: 8

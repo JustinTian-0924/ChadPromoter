@@ -19,24 +19,43 @@ public class DataManager {
 
 	public DataManager(JavaPlugin plugin) {
 		this.plugin = plugin;
-		this.playersFile = new File(plugin.getDataFolder(), "players.yml");
+		File dataFolder = new File(plugin.getDataFolder(), "data");
+		this.playersFile = new File(dataFolder, "players.yml");
 
 		createPlayersFile();
 		loadPlayersData();
 	}
 
 	private void createPlayersFile() {
-		if (!plugin.getDataFolder().exists()) {
-			plugin.getDataFolder().mkdirs();
+		File dataFolder = playersFile.getParentFile();
+
+		if (!dataFolder.exists()) {
+			dataFolder.mkdirs();
 		}
+
+		migrateOldPlayersFile();
 
 		if (!playersFile.exists()) {
 			try {
 				playersFile.createNewFile();
 			} catch (IOException exception) {
-				plugin.getLogger().severe("Could not create players.yml");
+				plugin.getLogger().severe("Could not create data/players.yml");
 				exception.printStackTrace();
 			}
+		}
+	}
+
+	private void migrateOldPlayersFile() {
+		File oldPlayersFile = new File(plugin.getDataFolder(), "players.yml");
+
+		if (!oldPlayersFile.exists() || playersFile.exists()) {
+			return;
+		}
+
+		if (oldPlayersFile.renameTo(playersFile)) {
+			plugin.getLogger().info("Moved players.yml to data/players.yml");
+		} else {
+			plugin.getLogger().warning("Could not move old players.yml to data/players.yml automatically.");
 		}
 	}
 
@@ -80,6 +99,8 @@ public class DataManager {
 		playersData.set(path + ".promote-code", promoteCode);
 		playersData.set(path + ".used-code", null);
 		playersData.set(path + ".promoted-by", null);
+		playersData.set(path + ".total-playtime-seconds", 0);
+		playersData.set(path + ".session-start-millis", null);
 
 		savePlayersData();
 	}
@@ -152,5 +173,40 @@ public class DataManager {
 			}
 		}
 		return promotedPlayers;
+	}
+
+	public void startPlaytimeSession(UUID playerUuid) {
+		playersData.set("players." + playerUuid + ".session-start-millis", System.currentTimeMillis());
+		savePlayersData();
+	}
+
+	public void stopPlaytimeSession(UUID playerUuid) {
+		String path = "players." + playerUuid;
+		long sessionStartMillis = playersData.getLong(path + ".session-start-millis", 0);
+
+		if (sessionStartMillis <= 0) {
+			return;
+		}
+
+		long onlineSeconds = (System.currentTimeMillis() - sessionStartMillis) / 1000;
+		long totalPlaytimeSeconds = playersData.getLong(path + ".total-playtime-seconds", 0);
+
+		playersData.set(path + ".total-playtime-seconds", totalPlaytimeSeconds + onlineSeconds);
+		playersData.set(path + ".session-start-millis", null);
+
+		savePlayersData();
+	}
+
+	public long getTotalPlaytimeSeconds(UUID playerUuid) {
+		String path = "players." + playerUuid;
+		long totalPlaytimeSeconds = playersData.getLong(path + ".total-playtime-seconds", 0);
+		long sessionStartMillis = playersData.getLong(path + ".session-start-millis", 0);
+
+		if (sessionStartMillis <= 0) {
+			return totalPlaytimeSeconds;
+		}
+
+		long currentSessionSeconds = (System.currentTimeMillis() - sessionStartMillis) / 1000;
+		return totalPlaytimeSeconds + currentSessionSeconds;
 	}
 }

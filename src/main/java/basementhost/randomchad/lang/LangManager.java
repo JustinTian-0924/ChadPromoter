@@ -98,4 +98,8 @@ public class LangManager {
 				})
 				.toList();
 	}
+
+	public void reload() {
+		loadLang();
+	}
 }

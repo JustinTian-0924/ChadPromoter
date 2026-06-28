@@ -4,9 +4,11 @@ import basementhost.randomchad.command.ChadPromoterCommand;
 import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.listener.GuiClickListener;
 import basementhost.randomchad.listener.PlayerJoinListener;
+import basementhost.randomchad.listener.PlayerQuitListener;
 import basementhost.randomchad.manager.DataManager;
 import basementhost.randomchad.manager.GuiManager;
 import basementhost.randomchad.manager.PromoteManager;
+import basementhost.randomchad.playtime.PlaytimeManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,6 +20,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private LangManager langManager;
 	private Economy economy;
 	private GuiManager guiManager;
+	private PlaytimeManager playtimeManager;
 
 	@Override
 	public void onEnable() {
@@ -25,7 +28,8 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 		this.langManager = new LangManager(this);
 		this.dataManager = new DataManager(this);
-		this.promoteManager = new PromoteManager(this, dataManager);
+		this.playtimeManager = new PlaytimeManager(this, dataManager);
+		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
 		this.guiManager = new GuiManager(dataManager, promoteManager, langManager);
 
 		setupVaultEconomy();
@@ -38,9 +42,11 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		if (dataManager != null) {
+			getServer().getOnlinePlayers().forEach(player ->
+					dataManager.stopPlaytimeSession(player.getUniqueId())
+			);
 			dataManager.savePlayersData();
 		}
-
 		getLogger().info("ChadPromoter plugin is disabled");
 	}
 
@@ -54,11 +60,22 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				new GuiClickListener(guiManager),
 				this
 		);
+
+		getServer().getPluginManager().registerEvents(
+				new PlayerQuitListener(dataManager),
+				this
+		);
 	}
 
 	private void registerCommands() {
-		ChadPromoterCommand command = new ChadPromoterCommand(promoteManager, langManager, guiManager);
-
+		ChadPromoterCommand command = new ChadPromoterCommand(
+				this,
+				promoteManager,
+				langManager,
+				guiManager,
+				playtimeManager,
+				dataManager
+		);
 		if (getCommand("chadpromoter") != null) {
 			getCommand("chadpromoter").setExecutor(command);
 			getCommand("chadpromoter").setTabCompleter(command);
@@ -102,5 +119,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public GuiManager getGuiManager() {
 		return guiManager;
+	}
+
+	public PlaytimeManager getPlaytimeManager() {
+		return playtimeManager;
 	}
 }

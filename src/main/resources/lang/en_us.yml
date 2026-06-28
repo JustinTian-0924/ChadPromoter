@@ -15,6 +15,9 @@ use-failed-already-used: "&cYou have already used a Promotion Code."
 use-failed-code-not-found: "&cThat Promotion Code does not exist."
 use-failed-not-new-player: "&cYou are no longer considered a new player."
 
+reload-success: "&aConfig and language files reloaded."
+reload-no-permission: "&cYou do not have permission to use this command."
+
 gui:
   title: "&8ChadPromoter"
   my-code-name: "&aYour Promotion Code"

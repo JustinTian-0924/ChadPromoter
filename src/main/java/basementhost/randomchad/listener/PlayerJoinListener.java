@@ -28,7 +28,7 @@ public class PlayerJoinListener implements Listener {
 
 		boolean alreadyHadData = dataManager.hasPlayer(player.getUniqueId());
 		String code = promoteManager.getOrCreatePromoteCode(player);
-
+		dataManager.startPlaytimeSession(player.getUniqueId());
 		String messagePath = alreadyHadData ? "code-existing" : "code-generated";
 		langManager.sendMessage(player, messagePath, Map.of("%code%", code));
 	}

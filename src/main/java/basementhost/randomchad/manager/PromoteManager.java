@@ -1,5 +1,6 @@
 package basementhost.randomchad.manager;
 
+import basementhost.randomchad.playtime.PlaytimeManager;
 import basementhost.randomchad.util.CodeUtil;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
@@ -11,10 +12,12 @@ public class PromoteManager {
 
 	private final JavaPlugin plugin;
 	private final DataManager dataManager;
+	private final PlaytimeManager playtimeManager;
 
-	public PromoteManager(JavaPlugin plugin, DataManager dataManager) {
+	public PromoteManager(JavaPlugin plugin, DataManager dataManager, PlaytimeManager playtimeManager) {
 		this.plugin = plugin;
 		this.dataManager = dataManager;
+		this.playtimeManager = playtimeManager;
 	}
 
 	public String getOrCreatePromoteCode(Player player) {
@@ -71,9 +74,8 @@ public class PromoteManager {
 
 	private boolean isNewPlayer(Player player) {
 		int maxPlaytimeSeconds = plugin.getConfig().getInt("new-player-max-playtime-seconds", 3600);
-		int playtimeTicks = player.getStatistic(Statistic.PLAY_ONE_MINUTE);
-
-		return playtimeTicks <= maxPlaytimeSeconds * 20;
+		long playtimeSeconds = playtimeManager.getPlaytimeSeconds(player.getUniqueId());
+		return playtimeSeconds <= maxPlaytimeSeconds;
 	}
 
 	private String generateUniqueCode() {

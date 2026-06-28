@@ -1,5 +1,5 @@
 name: ChadPromoter
-version: 0.0.3
+version: 0.0.4
 main: basementhost.randomchad.ChadPromoterPlugin
 api-version: '26.1.2'
 description: Promoter plugin
@@ -14,3 +14,8 @@ commands:
       - promoter
       - cpromoter
     usage: /chadpromoter
+
+permissions:
+  chadpromoter.reload:
+    description: Allows reloading ChadPromoter config and language files
+    default: op
