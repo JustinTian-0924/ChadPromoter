@@ -6,8 +6,35 @@ code-view: "&a你的 Promotion Code 是: &e%code%"
 
 player-only: "&c这个指令只能由玩家使用。"
 usage:
-  - "&e/chadpromoter &7- 查看你的 Promotion Code"
+  - "&e/chadpromoter &7- 打开 ChadPromoter 面板"
   - "&e/chadpromoter use <code> &7- 使用其他玩家的邀请码"
+  - "&e/chadpromoter reload &7- 重载配置、语言和奖励文件"
+reward:
+  claimed: "&a奖励领取成功！"
+  already-claimed: "&c这个奖励已经领取过了。"
+  not-unlocked: "&c这个奖励还没有达成领取条件。"
+  vault-unavailable: "&cVault 经济系统不可用，无法发放金币奖励。"
+rewards:
+  playtime_1h:
+    name: "&a邀请玩家游玩 1 小时"
+    lore:
+      - "&7条件: 被邀请玩家游玩满 &e1 小时"
+      - "&7奖励: &e1000 金币"
+  playtime_4h:
+    name: "&b邀请玩家游玩 4 小时"
+    lore:
+      - "&7条件: 被邀请玩家游玩满 &e4 小时"
+      - "&7奖励: &e5000 金币 + 3 个钻石"
+  playtime_12h:
+    name: "&b邀请玩家游玩 12 小时"
+    lore:
+      - "&7条件: 被邀请玩家游玩满 &e4 小时"
+      - "&7奖励: &e25000 金币 + 3 个钻石"
+  playtime_24h:
+    name: "&b邀请玩家游玩 24 小时"
+    lore:
+      - "&7条件: 被邀请玩家游玩满 &e4 小时"
+      - "&7奖励: &e100000 金币 + 3 个钻石"
 
 use-success: "&a绑定成功！你现在被记录为由 &e%promoter% &a邀请加入。"
 use-failed-own-code: "&c你不能使用自己的 Promotion Code。"
@@ -49,10 +76,25 @@ gui:
     - "&7UUID:"
     - "&f%uuid%"
     - ""
-    - "&7之后这里会显示奖励领取状态。"
+    - "&7点击这里会显示奖励领取状态。"
   no-promoted-players-name: "&c暂无邀请记录"
   no-promoted-players-lore:
     - "&7还没有玩家使用你的 Promotion Code。"
   previous-page-name: "&e上一页"
   next-page-name: "&e下一页"
   back-name: "&c返回主菜单"
+
+  reward-list-title: "&8%player% 的奖励"
+  reward-available-lore:
+    - ""
+    - "&a状态: 可领取"
+    - "&7点击领取这个奖励。"
+  reward-locked-lore:
+    - ""
+    - "&c状态: 未达成"
+    - "&7当前游玩时间: &e%current_playtime%"
+    - "&7需要游玩时间: &e%required_playtime%"
+  reward-claimed-lore:
+    - ""
+    - "&7状态: 已领取"
+  reward-back-name: "&c返回邀请列表"

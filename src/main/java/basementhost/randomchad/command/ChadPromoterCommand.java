@@ -4,6 +4,7 @@ import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.manager.DataManager;
 import basementhost.randomchad.manager.GuiManager;
 import basementhost.randomchad.manager.PromoteManager;
+import basementhost.randomchad.manager.RewardManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,6 +23,7 @@ public class ChadPromoterCommand implements TabExecutor {
 	private final JavaPlugin plugin;
 	private final PlaytimeManager playtimeManager;
 	private final DataManager dataManager;
+	private final RewardManager rewardManager;
 
 	public ChadPromoterCommand(
 			JavaPlugin plugin,
@@ -29,7 +31,8 @@ public class ChadPromoterCommand implements TabExecutor {
 			LangManager langManager,
 			GuiManager guiManager,
 			PlaytimeManager playtimeManager,
-			DataManager dataManager
+			DataManager dataManager,
+			RewardManager rewardManager
 	) {
 		this.plugin = plugin;
 		this.promoteManager = promoteManager;
@@ -37,6 +40,7 @@ public class ChadPromoterCommand implements TabExecutor {
 		this.guiManager = guiManager;
 		this.playtimeManager = playtimeManager;
 		this.dataManager = dataManager;
+		this.rewardManager = rewardManager;
 	}
 
 	@Override
@@ -50,6 +54,7 @@ public class ChadPromoterCommand implements TabExecutor {
 			langManager.reload();
 			dataManager.loadPlayersData();
 			playtimeManager.reload();
+			rewardManager.reload();
 			langManager.sendMessage(sender, "reload-success");
 			return true;
 		}

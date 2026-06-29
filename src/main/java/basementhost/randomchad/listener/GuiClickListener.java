@@ -38,6 +38,11 @@ public class GuiClickListener implements Listener {
 
 		if (holder.getGuiType() == ChadPromoterGuiHolder.GuiType.PROMOTED_LIST) {
 			handlePromotedListClick(player, event.getSlot(), holder.getPage());
+			return;
+		}
+
+		if (holder.getGuiType() == ChadPromoterGuiHolder.GuiType.REWARD_LIST) {
+			handleRewardListClick(player, event.getSlot(), holder);
 		}
 	}
 
@@ -48,6 +53,11 @@ public class GuiClickListener implements Listener {
 	}
 
 	private void handlePromotedListClick(Player player, int slot, int page) {
+		if (slot >= 0 && slot < 21) {
+			guiManager.openRewardListGuiByPromotedListSlot(player, page, slot);
+			return;
+		}
+
 		if (slot == 18 && page > 0) {
 			guiManager.openPromotedPlayersGui(player, page - 1);
 			return;
@@ -60,6 +70,17 @@ public class GuiClickListener implements Listener {
 
 		if (slot == 26) {
 			guiManager.openPromotedPlayersGui(player, page + 1);
+		}
+	}
+
+	private void handleRewardListClick(Player player, int slot, ChadPromoterGuiHolder holder) {
+		if (slot >= 0 && slot < 21) {
+			guiManager.claimRewardFromGui(player, holder.getPromotedPlayerUuid(), slot);
+			return;
+		}
+
+		if (slot == 22) {
+			guiManager.openPromotedPlayersGui(player, 0);
 		}
 	}
 }

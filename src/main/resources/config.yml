@@ -1,14 +1,8 @@
-language: "zh_cn"
+language: "en_us"
 playtime:
   source: "internal"
   fallback-to-internal: true
-new-player-max-playtime-seconds: 3600
+new-player-max-playtime-seconds: 14400
 code:
   length: 8
   characters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-rewards:
-  playtime_1h:
-    required-playtime-seconds: 3600
-    display-name: "Invited player's playtime exceed one hour"
-    commands:
-      - "eco give %promoter% 1000"

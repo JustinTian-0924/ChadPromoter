@@ -6,8 +6,37 @@ code-view: "&aYour Promotion Code is: &e%code%"
 
 player-only: "&cOnly players can use this command."
 usage:
-  - "&e/chadpromoter &7- View your Promotion Code"
+  - "&e/chadpromoter &7- Open ChadPromoter panel"
   - "&e/chadpromoter use <code> &7- Use another player's Promotion Code"
+  - "&e/chadpromoter reload &7- Reload config, language and rewards"
+
+reward:
+  claimed: "&aReward claimed successfully!"
+  already-claimed: "&cThis reward has already been claimed."
+  not-unlocked: "&cThis reward is not unlocked yet."
+  vault-unavailable: "&cVault economy is unavailable, money reward cannot be given."
+
+rewards:
+  playtime_1h:
+    name: "&aInvited player played for 1 hour"
+    lore:
+      - "&7Requirement: invited player reaches &e1 hour"
+      - "&7Reward: &e1000 coins"
+  playtime_4h:
+    name: "&bInvited player played for 4 hours"
+    lore:
+      - "&7Requirement: invited player reaches &e4 hours"
+      - "&7Reward: &e5000 coins + 3 diamonds"
+  playtime_12h:
+    name: "&bInvited player played for 12 hours"
+    lore:
+      - "&7Requirement: invited player reaches &e12 hours"
+      - "&7Reward: &e25000 coins + 3 diamonds"
+  playtime_24h:
+    name: "&bInvited player played for 24 hours"
+    lore:
+      - "&7Requirement: invited player reaches &e24 hours"
+      - "&7Reward: &e100000 coins + 3 diamonds"
 
 use-success: "&aSuccess! You are now recorded as invited by &e%promoter%&a."
 use-failed-own-code: "&cYou cannot use your own Promotion Code."
@@ -49,10 +78,25 @@ gui:
     - "&7UUID:"
     - "&f%uuid%"
     - ""
-    - "&7Reward status will be shown here later."
+    - "&7Click to view rewards for this player."
   no-promoted-players-name: "&cNo Invited Players"
   no-promoted-players-lore:
     - "&7No player has used your Promotion Code yet."
   previous-page-name: "&ePrevious Page"
   next-page-name: "&eNext Page"
   back-name: "&cBack to Main Menu"
+
+  reward-list-title: "&8Rewards of %player%"
+  reward-available-lore:
+    - ""
+    - "&aStatus: Available"
+    - "&7Click to claim this reward."
+  reward-locked-lore:
+    - ""
+    - "&cStatus: Locked"
+    - "&7Current playtime: &e%current_playtime%"
+    - "&7Required playtime: &e%required_playtime%"
+  reward-claimed-lore:
+    - ""
+    - "&7Status: Claimed"
+  reward-back-name: "&cBack to invited players"

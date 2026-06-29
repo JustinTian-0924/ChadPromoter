@@ -99,6 +99,10 @@ public class LangManager {
 				.toList();
 	}
 
+	public List<String> getRawMessageList(String path) {
+		return getRawMessageList(path, Map.of());
+	}
+
 	public void reload() {
 		loadLang();
 	}

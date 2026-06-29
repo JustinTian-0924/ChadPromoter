@@ -1,0 +1,40 @@
+rewards:
+  playtime_1h:
+    type: "playtime"
+    required-playtime-seconds: 3600
+    material: "EMERALD"
+    display-name-lang-key: "rewards.playtime_1h.name"
+    lore-lang-key: "rewards.playtime_1h.lore"
+    money: 1000.0
+    commands:
+      - "say %promoter% claimed a promoter reward from %promoted%"
+
+  playtime_4h:
+    type: "playtime"
+    required-playtime-seconds: 14400
+    material: "DIAMOND"
+    display-name-lang-key: "rewards.playtime_4h.name"
+    lore-lang-key: "rewards.playtime_4h.lore"
+    money: 5000.0
+    commands:
+      - "give %promoter% diamond 3"
+
+  playtime_12h:
+    type: "playtime"
+    required-playtime-seconds: 43200
+    material: "DIAMOND"
+    display-name-lang-key: "rewards.playtime_12h.name"
+    lore-lang-key: "rewards.playtime_12h.lore"
+    money: 5000.0
+    commands:
+      - "give %promoter% diamond 3"
+
+  playtime_24h:
+    type: "playtime"
+    required-playtime-seconds: 86400
+    material: "DIAMOND"
+    display-name-lang-key: "rewards.playtime_24h.name"
+    lore-lang-key: "rewards.playtime_24h.lore"
+    money: 5000.0
+    commands:
+      - "give %promoter% diamond 3"

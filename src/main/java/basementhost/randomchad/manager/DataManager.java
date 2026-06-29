@@ -209,4 +209,18 @@ public class DataManager {
 		long currentSessionSeconds = (System.currentTimeMillis() - sessionStartMillis) / 1000;
 		return totalPlaytimeSeconds + currentSessionSeconds;
 	}
+
+	public boolean hasClaimedReward(UUID promoterUuid, UUID promotedPlayerUuid, String rewardId) {
+		String path = "players." + promotedPlayerUuid + ".claimed-rewards." + promoterUuid;
+		return playersData.getStringList(path).contains(rewardId);
+	}
+	public void markRewardClaimed(UUID promoterUuid, UUID promotedPlayerUuid, String rewardId) {
+		String path = "players." + promotedPlayerUuid + ".claimed-rewards." + promoterUuid;
+		List<String> claimedRewards = new ArrayList<>(playersData.getStringList(path));
+		if (!claimedRewards.contains(rewardId)) {
+			claimedRewards.add(rewardId);
+			playersData.set(path, claimedRewards);
+			savePlayersData();
+		}
+	}
 }

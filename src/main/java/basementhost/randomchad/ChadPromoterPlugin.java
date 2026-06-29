@@ -8,6 +8,7 @@ import basementhost.randomchad.listener.PlayerQuitListener;
 import basementhost.randomchad.manager.DataManager;
 import basementhost.randomchad.manager.GuiManager;
 import basementhost.randomchad.manager.PromoteManager;
+import basementhost.randomchad.manager.RewardManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -21,6 +22,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private Economy economy;
 	private GuiManager guiManager;
 	private PlaytimeManager playtimeManager;
+	private RewardManager rewardManager;
 
 	@Override
 	public void onEnable() {
@@ -30,7 +32,14 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		this.dataManager = new DataManager(this);
 		this.playtimeManager = new PlaytimeManager(this, dataManager);
 		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
-		this.guiManager = new GuiManager(dataManager, promoteManager, langManager);
+		this.rewardManager = new RewardManager(this, dataManager);
+		this.guiManager = new GuiManager(
+				dataManager,
+				promoteManager,
+				langManager,
+				rewardManager,
+				playtimeManager
+		);
 
 		setupVaultEconomy();
 		registerListeners();
@@ -74,7 +83,8 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				langManager,
 				guiManager,
 				playtimeManager,
-				dataManager
+				dataManager,
+				rewardManager
 		);
 		if (getCommand("chadpromoter") != null) {
 			getCommand("chadpromoter").setExecutor(command);
@@ -123,5 +133,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public PlaytimeManager getPlaytimeManager() {
 		return playtimeManager;
+	}
+
+	public RewardManager getRewardManager() {
+		return rewardManager;
 	}
 }
