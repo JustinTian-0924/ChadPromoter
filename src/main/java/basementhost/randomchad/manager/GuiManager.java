@@ -3,12 +3,17 @@ package basementhost.randomchad.manager;
 import basementhost.randomchad.gui.ChadPromoterGuiHolder;
 import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
+import basementhost.randomchad.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +22,9 @@ import java.util.UUID;
 
 public class GuiManager {
 
+	private static final int ITEMS_PER_PAGE = 21;
+
+	private final JavaPlugin plugin;
 	private final DataManager dataManager;
 	private final PromoteManager promoteManager;
 	private final LangManager langManager;
@@ -24,12 +32,14 @@ public class GuiManager {
 	private final PlaytimeManager playtimeManager;
 
 	public GuiManager(
+			JavaPlugin plugin,
 			DataManager dataManager,
 			PromoteManager promoteManager,
 			LangManager langManager,
 			RewardManager rewardManager,
 			PlaytimeManager playtimeManager
 	) {
+		this.plugin = plugin;
 		this.dataManager = dataManager;
 		this.promoteManager = promoteManager;
 		this.langManager = langManager;
@@ -52,8 +62,8 @@ public class GuiManager {
 
 		holder.setInventory(inventory);
 
-		inventory.setItem(11, createItem(
-				Material.NAME_TAG,
+		inventory.setItem(11, createPlayerHeadItem(
+				player.getUniqueId(),
 				langManager.getRawMessage("gui.my-code-name"),
 				langManager.getRawMessageList("gui.my-code-lore", Map.of("%code%", code))
 		));
@@ -80,14 +90,18 @@ public class GuiManager {
 				langManager.getRawMessageList("gui.help-lore", Map.of())
 		));
 
+		fillEmptySlots(inventory);
 		player.openInventory(inventory);
 	}
 
 	public void openPromotedPlayersGui(Player player, int page) {
 		List<UUID> promotedPlayerUuids = dataManager.getPromotedPlayerUuids(player.getUniqueId());
-		int itemsPerPage = 21;
-		int startIndex = page * itemsPerPage;
-		int endIndex = Math.min(startIndex + itemsPerPage, promotedPlayerUuids.size());
+
+		int maxPage = getMaxPage(promotedPlayerUuids.size());
+		page = clampPage(page, maxPage);
+
+		int startIndex = page * ITEMS_PER_PAGE;
+		int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, promotedPlayerUuids.size());
 
 		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
 				ChadPromoterGuiHolder.GuiType.PROMOTED_LIST,
@@ -113,8 +127,8 @@ public class GuiManager {
 				UUID promotedPlayerUuid = promotedPlayerUuids.get(index);
 				String playerName = dataManager.getPlayerName(promotedPlayerUuid);
 
-				inventory.setItem(index - startIndex, createItem(
-						Material.PLAYER_HEAD,
+				inventory.setItem(index - startIndex, createPlayerHeadItem(
+						promotedPlayerUuid,
 						langManager.getRawMessage("gui.promoted-player-name", Map.of("%player%", playerName)),
 						langManager.getRawMessageList(
 								"gui.promoted-player-lore",
@@ -149,16 +163,26 @@ public class GuiManager {
 			));
 		}
 
+		fillEmptySlots(inventory);
 		player.openInventory(inventory);
 	}
 
-	public void openRewardListGui(Player promoter, UUID promotedPlayerUuid) {
+	public void openRewardListGui(Player promoter, UUID promotedPlayerUuid, int rewardPage, int promotedListPage) {
 		String promotedPlayerName = dataManager.getPlayerName(promotedPlayerUuid);
 		long promotedPlaytimeSeconds = playtimeManager.getPlaytimeSeconds(promotedPlayerUuid);
 
+		List<RewardDefinition> rewards = new ArrayList<>(rewardManager.getRewards());
+
+		int maxPage = getMaxPage(rewards.size());
+		rewardPage = clampPage(rewardPage, maxPage);
+
+		int startIndex = rewardPage * ITEMS_PER_PAGE;
+		int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, rewards.size());
+
 		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
 				ChadPromoterGuiHolder.GuiType.REWARD_LIST,
-				0,
+				rewardPage,
+				promotedListPage,
 				promotedPlayerUuid
 		);
 
@@ -173,9 +197,8 @@ public class GuiManager {
 
 		holder.setInventory(inventory);
 
-		List<RewardDefinition> rewards = new ArrayList<>(rewardManager.getRewards());
-
-		for (int index = 0; index < rewards.size() && index < 21; index++) {
+		for (int index = startIndex; index < endIndex; index++) {
+			int slot = index - startIndex;
 			RewardDefinition reward = rewards.get(index);
 
 			boolean claimed = dataManager.hasClaimedReward(
@@ -192,8 +215,8 @@ public class GuiManager {
 
 			List<String> lore = new ArrayList<>(
 					langManager.getRawMessageList(reward.getLoreLangKey(), Map.of(
-							"%current_playtime%", formatSeconds(promotedPlaytimeSeconds),
-							"%required_playtime%", formatSeconds(reward.getRequiredPlaytimeSeconds())
+							"%current_playtime%", TimeUtil.formatSeconds(langManager, promotedPlaytimeSeconds),
+							"%required_playtime%", TimeUtil.formatSeconds(langManager, reward.getRequiredPlaytimeSeconds())
 					))
 			);
 
@@ -203,8 +226,8 @@ public class GuiManager {
 				lore.addAll(langManager.getRawMessageList("gui.reward-available-lore", Map.of()));
 			} else {
 				lore.addAll(langManager.getRawMessageList("gui.reward-locked-lore", Map.of(
-						"%current_playtime%", formatSeconds(promotedPlaytimeSeconds),
-						"%required_playtime%", formatSeconds(reward.getRequiredPlaytimeSeconds())
+						"%current_playtime%", TimeUtil.formatSeconds(langManager, promotedPlaytimeSeconds),
+						"%required_playtime%", TimeUtil.formatSeconds(langManager, reward.getRequiredPlaytimeSeconds())
 				)));
 			}
 
@@ -216,10 +239,18 @@ public class GuiManager {
 				material = Material.GRAY_DYE;
 			}
 
-			inventory.setItem(index, createItem(
+			inventory.setItem(slot, createItem(
 					material,
 					langManager.getRawMessage(reward.getDisplayNameLangKey()),
 					lore
+			));
+		}
+
+		if (rewardPage > 0) {
+			inventory.setItem(18, createItem(
+					Material.ARROW,
+					langManager.getRawMessage("gui.reward-previous-page-name"),
+					List.of()
 			));
 		}
 
@@ -229,41 +260,51 @@ public class GuiManager {
 				List.of()
 		));
 
-		playerOpen(promoter, inventory);
+		if (endIndex < rewards.size()) {
+			inventory.setItem(26, createItem(
+					Material.ARROW,
+					langManager.getRawMessage("gui.reward-next-page-name"),
+					List.of()
+			));
+		}
+
+		fillEmptySlots(inventory);
+		promoter.openInventory(inventory);
 	}
 
-	public void openRewardListGuiByPromotedListSlot(Player promoter, int page, int slot) {
-		if (slot < 0 || slot >= 21) {
+	public void openRewardListGuiByPromotedListSlot(Player promoter, int promotedListPage, int slot) {
+		if (slot < 0 || slot >= ITEMS_PER_PAGE) {
 			return;
 		}
 
 		List<UUID> promotedPlayerUuids = dataManager.getPromotedPlayerUuids(promoter.getUniqueId());
-		int index = page * 21 + slot;
+		int index = promotedListPage * ITEMS_PER_PAGE + slot;
 
 		if (index < 0 || index >= promotedPlayerUuids.size()) {
 			return;
 		}
 
 		UUID promotedPlayerUuid = promotedPlayerUuids.get(index);
-		openRewardListGui(promoter, promotedPlayerUuid);
+		openRewardListGui(promoter, promotedPlayerUuid, 0, promotedListPage);
 	}
 
-	public void claimRewardFromGui(Player promoter, UUID promotedPlayerUuid, int slot) {
+	public void claimRewardFromGui(Player promoter, UUID promotedPlayerUuid, int rewardPage, int promotedListPage, int slot) {
 		if (promotedPlayerUuid == null) {
 			return;
 		}
 
-		if (slot < 0 || slot >= 21) {
+		if (slot < 0 || slot >= ITEMS_PER_PAGE) {
 			return;
 		}
 
 		List<RewardDefinition> rewards = new ArrayList<>(rewardManager.getRewards());
+		int rewardIndex = rewardPage * ITEMS_PER_PAGE + slot;
 
-		if (slot >= rewards.size()) {
+		if (rewardIndex < 0 || rewardIndex >= rewards.size()) {
 			return;
 		}
 
-		RewardDefinition reward = rewards.get(slot);
+		RewardDefinition reward = rewards.get(rewardIndex);
 		long promotedPlaytimeSeconds = playtimeManager.getPlaytimeSeconds(promotedPlayerUuid);
 
 		RewardManager.ClaimResult result = rewardManager.claimReward(
@@ -280,11 +321,7 @@ public class GuiManager {
 			case VAULT_UNAVAILABLE -> langManager.sendMessage(promoter, "reward.vault-unavailable");
 		}
 
-		openRewardListGui(promoter, promotedPlayerUuid);
-	}
-
-	private void playerOpen(Player player, Inventory inventory) {
-		player.openInventory(inventory);
+		openRewardListGui(promoter, promotedPlayerUuid, rewardPage, promotedListPage);
 	}
 
 	private ItemStack createItem(Material material, String name, List<String> lore) {
@@ -300,19 +337,62 @@ public class GuiManager {
 		return itemStack;
 	}
 
-	private String formatSeconds(long seconds) {
-		long hours = seconds / 3600;
-		long minutes = (seconds % 3600) / 60;
-		long remainingSeconds = seconds % 60;
+	private ItemStack createPlayerHeadItem(UUID playerUuid, String name, List<String> lore) {
+		ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+		ItemMeta itemMeta = itemStack.getItemMeta();
 
-		if (hours > 0) {
-			return hours + "h " + minutes + "m";
+		if (itemMeta instanceof SkullMeta skullMeta) {
+			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerUuid);
+			skullMeta.setOwningPlayer(offlinePlayer);
+			skullMeta.setDisplayName(name);
+			skullMeta.setLore(lore);
+			itemStack.setItemMeta(skullMeta);
 		}
 
-		if (minutes > 0) {
-			return minutes + "m " + remainingSeconds + "s";
+		return itemStack;
+	}
+
+	private void fillEmptySlots(Inventory inventory) {
+		FileConfiguration config = plugin.getConfig();
+
+		if (!config.getBoolean("gui.fill-empty-slots", true)) {
+			return;
 		}
 
-		return remainingSeconds + "s";
+		Material fillerMaterial = Material.matchMaterial(
+				config.getString("gui.filler-material", "GRAY_STAINED_GLASS_PANE")
+		);
+
+		if (fillerMaterial == null) {
+			fillerMaterial = Material.GRAY_STAINED_GLASS_PANE;
+		}
+
+		ItemStack filler = createItem(
+				fillerMaterial,
+				langManager.getRawMessage("gui.filler-name"),
+				List.of()
+		);
+
+		for (int slot = 0; slot < inventory.getSize(); slot++) {
+			if (inventory.getItem(slot) == null) {
+				inventory.setItem(slot, filler);
+			}
+		}
+	}
+
+	private int getMaxPage(int itemCount) {
+		if (itemCount <= 0) {
+			return 0;
+		}
+
+		return (itemCount - 1) / ITEMS_PER_PAGE;
+	}
+
+	private int clampPage(int page, int maxPage) {
+		if (page < 0) {
+			return 0;
+		}
+
+		return Math.min(page, maxPage);
 	}
 }

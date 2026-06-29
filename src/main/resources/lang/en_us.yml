@@ -16,6 +16,11 @@ reward:
   not-unlocked: "&cThis reward is not unlocked yet."
   vault-unavailable: "&cVault economy is unavailable, money reward cannot be given."
 
+time:
+  hours-minutes: "%hours%h %minutes%m"
+  minutes-seconds: "%minutes%m %seconds%s"
+  seconds: "%seconds%s"
+
 rewards:
   playtime_1h:
     name: "&aInvited player played for 1 hour"
@@ -49,6 +54,9 @@ reload-no-permission: "&cYou do not have permission to use this command."
 
 gui:
   title: "&8ChadPromoter"
+  filler-name: " "
+  reward-previous-page-name: "&eLast page"
+  reward-next-page-name: "&eNext page"
   my-code-name: "&aYour Promotion Code"
   my-code-lore:
     - "&7Your code is:"
@@ -100,3 +108,26 @@ gui:
     - ""
     - "&7Status: Claimed"
   reward-back-name: "&cBack to invited players"
+
+admin:
+  none: "none"
+  no-permission: "&cYou do not have permission to use admin commands."
+  usage:
+    - "&e/cpromoter admin info <player> &7- View player promotion data"
+    - "&e/cpromoter admin resetbind <player> &7- Reset player's used promotion code"
+    - "&e/cpromoter admin resetrewards <promotedPlayer> &7- Reset claimed rewards stored on invited player"
+    - "&e/cpromoter admin reload &7- Reload plugin files"
+  player-not-found: "&cNo data found for player: &e%player%"
+  info:
+    - "&8&m-------------------------"
+    - "&aPlayer: &e%player%"
+    - "&aUUID: &e%uuid%"
+    - "&aPromotion Code: &e%code%"
+    - "&aUsed Code: &e%used_code%"
+    - "&aPromoted By: &e%promoted_by%"
+    - "&aInvited Count: &e%invited_count%"
+    - "&aPlaytime Source: &e%playtime_source%"
+    - "&aPlaytime: &e%playtime%"
+    - "&8&m-------------------------"
+  resetbind-success: "&aReset used promotion code for &e%player%&a."
+  resetrewards-success: "&aCleared claimed rewards stored on invited player &e%player%&a."

@@ -75,12 +75,38 @@ public class GuiClickListener implements Listener {
 
 	private void handleRewardListClick(Player player, int slot, ChadPromoterGuiHolder holder) {
 		if (slot >= 0 && slot < 21) {
-			guiManager.claimRewardFromGui(player, holder.getPromotedPlayerUuid(), slot);
+			guiManager.claimRewardFromGui(
+					player,
+					holder.getPromotedPlayerUuid(),
+					holder.getPage(),
+					holder.getParentPage(),
+					slot
+			);
+			return;
+		}
+
+		if (slot == 18 && holder.getPage() > 0) {
+			guiManager.openRewardListGui(
+					player,
+					holder.getPromotedPlayerUuid(),
+					holder.getPage() - 1,
+					holder.getParentPage()
+			);
 			return;
 		}
 
 		if (slot == 22) {
-			guiManager.openPromotedPlayersGui(player, 0);
+			guiManager.openPromotedPlayersGui(player, holder.getParentPage());
+			return;
+		}
+
+		if (slot == 26) {
+			guiManager.openRewardListGui(
+					player,
+					holder.getPromotedPlayerUuid(),
+					holder.getPage() + 1,
+					holder.getParentPage()
+			);
 		}
 	}
 }

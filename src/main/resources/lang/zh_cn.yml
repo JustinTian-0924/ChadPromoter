@@ -45,8 +45,16 @@ use-failed-not-new-player: "&c你已经不属于新玩家，不能再使用 Prom
 reload-success: "&a配置文件和语言文件已重新加载。"
 reload-no-permission: "&c你没有权限使用这个指令。"
 
+time:
+  hours-minutes: "%hours%小时%minutes%分钟"
+  minutes-seconds: "%minutes%分钟%seconds%秒"
+  seconds: "%seconds%秒"
+
 gui:
   title: "&8ChadPromoter"
+  filler-name: " "
+  reward-previous-page-name: "&e上一页"
+  reward-next-page-name: "&e下一页"
   my-code-name: "&a你的 Promotion Code"
   my-code-lore:
     - "&7你的邀请码是:"
@@ -98,3 +106,26 @@ gui:
     - ""
     - "&7状态: 已领取"
   reward-back-name: "&c返回邀请列表"
+
+admin:
+  none: "无"
+  no-permission: "&c你没有权限使用管理员指令。"
+  usage:
+    - "&e/cpromoter admin info <player> &7- 查看玩家推广数据"
+    - "&e/cpromoter admin resetbind <player> &7- 重置玩家的邀请码绑定"
+    - "&e/cpromoter admin resetrewards <promotedPlayer> &7- 重置被邀请玩家身上的奖励领取记录"
+    - "&e/cpromoter admin reload &7- 重载插件配置"
+  player-not-found: "&c找不到这个玩家的数据: &e%player%"
+  info:
+    - "&8&m-------------------------"
+    - "&a玩家: &e%player%"
+    - "&aUUID: &e%uuid%"
+    - "&aPromotion Code: &e%code%"
+    - "&aUsed Code: &e%used_code%"
+    - "&aPromoted By: &e%promoted_by%"
+    - "&a邀请人数: &e%invited_count%"
+    - "&aPlaytime 来源: &e%playtime_source%"
+    - "&aPlaytime: &e%playtime%"
+    - "&8&m-------------------------"
+  resetbind-success: "&a已重置玩家 &e%player% &a的邀请码绑定。"
+  resetrewards-success: "&a已清空被邀请玩家 &e%player% &a身上的奖励领取记录。"

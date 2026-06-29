@@ -103,6 +103,16 @@ public class LangManager {
 		return getRawMessageList(path, Map.of());
 	}
 
+	public void sendMessageList(CommandSender sender, String path, Map<String, String> placeholders) {
+		List<String> messages = lang.getStringList(path);
+		for (String message : messages) {
+			for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+				message = message.replace(entry.getKey(), entry.getValue());
+			}
+			sender.sendMessage(color(message));
+		}
+	}
+
 	public void reload() {
 		loadLang();
 	}

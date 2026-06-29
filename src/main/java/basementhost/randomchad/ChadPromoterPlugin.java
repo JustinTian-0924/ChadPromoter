@@ -34,6 +34,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
 		this.rewardManager = new RewardManager(this, dataManager);
 		this.guiManager = new GuiManager(
+				this,
 				dataManager,
 				promoteManager,
 				langManager,

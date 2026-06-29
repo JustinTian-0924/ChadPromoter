@@ -214,6 +214,7 @@ public class DataManager {
 		String path = "players." + promotedPlayerUuid + ".claimed-rewards." + promoterUuid;
 		return playersData.getStringList(path).contains(rewardId);
 	}
+
 	public void markRewardClaimed(UUID promoterUuid, UUID promotedPlayerUuid, String rewardId) {
 		String path = "players." + promotedPlayerUuid + ".claimed-rewards." + promoterUuid;
 		List<String> claimedRewards = new ArrayList<>(playersData.getStringList(path));
@@ -222,5 +223,39 @@ public class DataManager {
 			playersData.set(path, claimedRewards);
 			savePlayersData();
 		}
+	}
+
+	public UUID findPlayerUuidByName(String playerName) {
+		Set<String> playerUuids = playersData.getConfigurationSection("players") == null
+				? Set.of()
+				: playersData.getConfigurationSection("players").getKeys(false);
+
+		for (String playerUuid : playerUuids) {
+			String existingName = playersData.getString("players." + playerUuid + ".name");
+
+			if (existingName != null && existingName.equalsIgnoreCase(playerName)) {
+				return UUID.fromString(playerUuid);
+			}
+		}
+
+		return null;
+	}
+
+	public String getPromotedBy(UUID playerUuid) {
+		return playersData.getString("players." + playerUuid + ".promoted-by");
+	}
+
+	public void resetBind(UUID playerUuid) {
+		String path = "players." + playerUuid;
+
+		playersData.set(path + ".used-code", null);
+		playersData.set(path + ".promoted-by", null);
+
+		savePlayersData();
+	}
+
+	public void resetClaimedRewards(UUID promotedPlayerUuid) {
+		playersData.set("players." + promotedPlayerUuid + ".claimed-rewards", null);
+		savePlayersData();
 	}
 }

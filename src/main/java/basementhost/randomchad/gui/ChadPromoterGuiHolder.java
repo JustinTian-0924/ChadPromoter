@@ -9,16 +9,22 @@ public class ChadPromoterGuiHolder implements InventoryHolder {
 
 	private final GuiType guiType;
 	private final int page;
+	private final int parentPage;
 	private final UUID promotedPlayerUuid;
 	private Inventory inventory;
 
 	public ChadPromoterGuiHolder(GuiType guiType, int page) {
-		this(guiType, page, null);
+		this(guiType, page, 0, null);
 	}
 
 	public ChadPromoterGuiHolder(GuiType guiType, int page, UUID promotedPlayerUuid) {
+		this(guiType, page, 0, promotedPlayerUuid);
+	}
+
+	public ChadPromoterGuiHolder(GuiType guiType, int page, int parentPage, UUID promotedPlayerUuid) {
 		this.guiType = guiType;
 		this.page = page;
+		this.parentPage = parentPage;
 		this.promotedPlayerUuid = promotedPlayerUuid;
 	}
 
@@ -28,6 +34,10 @@ public class ChadPromoterGuiHolder implements InventoryHolder {
 
 	public int getPage() {
 		return page;
+	}
+
+	public int getParentPage() {
+		return parentPage;
 	}
 
 	public UUID getPromotedPlayerUuid() {
