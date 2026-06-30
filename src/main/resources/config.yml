@@ -6,6 +6,3 @@ new-player-max-playtime-seconds: 14400
 code:
   length: 8
   characters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-gui:
-  fill-empty-slots: true
-  filler-material: "GRAY_STAINED_GLASS_PANE"

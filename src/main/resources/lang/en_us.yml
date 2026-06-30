@@ -49,7 +49,7 @@ use-failed-already-used: "&cYou have already used a Promotion Code."
 use-failed-code-not-found: "&cThat Promotion Code does not exist."
 use-failed-not-new-player: "&cYou are no longer considered a new player."
 
-reload-success: "&aConfig and language files reloaded."
+reload-success: "&aConfig, language, rewards and GUI files reloaded."
 reload-no-permission: "&cYou do not have permission to use this command."
 
 gui:

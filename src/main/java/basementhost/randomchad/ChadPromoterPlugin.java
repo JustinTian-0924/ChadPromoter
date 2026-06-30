@@ -5,10 +5,7 @@ import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.listener.GuiClickListener;
 import basementhost.randomchad.listener.PlayerJoinListener;
 import basementhost.randomchad.listener.PlayerQuitListener;
-import basementhost.randomchad.manager.DataManager;
-import basementhost.randomchad.manager.GuiManager;
-import basementhost.randomchad.manager.PromoteManager;
-import basementhost.randomchad.manager.RewardManager;
+import basementhost.randomchad.manager.*;
 import basementhost.randomchad.playtime.PlaytimeManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -23,6 +20,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private GuiManager guiManager;
 	private PlaytimeManager playtimeManager;
 	private RewardManager rewardManager;
+	private GuiConfigManager guiConfigManager;
 
 	@Override
 	public void onEnable() {
@@ -30,16 +28,17 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 		this.langManager = new LangManager(this);
 		this.dataManager = new DataManager(this);
+		this.guiConfigManager = new GuiConfigManager(this);
 		this.playtimeManager = new PlaytimeManager(this, dataManager);
 		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
 		this.rewardManager = new RewardManager(this, dataManager);
 		this.guiManager = new GuiManager(
-				this,
 				dataManager,
 				promoteManager,
 				langManager,
 				rewardManager,
-				playtimeManager
+				playtimeManager,
+				guiConfigManager
 		);
 
 		setupVaultEconomy();
@@ -67,7 +66,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		);
 
 		getServer().getPluginManager().registerEvents(
-				new GuiClickListener(guiManager),
+				new GuiClickListener(guiManager, guiConfigManager),
 				this
 		);
 
@@ -85,7 +84,8 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				guiManager,
 				playtimeManager,
 				dataManager,
-				rewardManager
+				rewardManager,
+				guiConfigManager
 		);
 		if (getCommand("chadpromoter") != null) {
 			getCommand("chadpromoter").setExecutor(command);
@@ -138,5 +138,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public RewardManager getRewardManager() {
 		return rewardManager;
+	}
+
+	public GuiConfigManager getGuiConfigManager() {
+		return guiConfigManager;
 	}
 }

@@ -22,29 +22,27 @@ import java.util.UUID;
 
 public class GuiManager {
 
-	private static final int ITEMS_PER_PAGE = 21;
-
-	private final JavaPlugin plugin;
 	private final DataManager dataManager;
 	private final PromoteManager promoteManager;
 	private final LangManager langManager;
 	private final RewardManager rewardManager;
 	private final PlaytimeManager playtimeManager;
+	private final GuiConfigManager guiConfigManager;
 
 	public GuiManager(
-			JavaPlugin plugin,
 			DataManager dataManager,
 			PromoteManager promoteManager,
 			LangManager langManager,
 			RewardManager rewardManager,
-			PlaytimeManager playtimeManager
+			PlaytimeManager playtimeManager,
+			GuiConfigManager guiConfigManager
 	) {
-		this.plugin = plugin;
 		this.dataManager = dataManager;
 		this.promoteManager = promoteManager;
 		this.langManager = langManager;
 		this.rewardManager = rewardManager;
 		this.playtimeManager = playtimeManager;
+		this.guiConfigManager = guiConfigManager;
 	}
 
 	public void openMainGui(Player player) {
@@ -62,29 +60,27 @@ public class GuiManager {
 
 		holder.setInventory(inventory);
 
-		inventory.setItem(11, createPlayerHeadItem(
+		inventory.setItem(guiConfigManager.getInt("main.my-code.slot", 11), createPlayerHeadItem(
 				player.getUniqueId(),
 				langManager.getRawMessage("gui.my-code-name"),
 				langManager.getRawMessageList("gui.my-code-lore", Map.of("%code%", code))
 		));
 
-		inventory.setItem(13, createItem(
+		inventory.setItem(guiConfigManager.getInt("main.invited-count.slot", 13), createItem(
 				Material.PLAYER_HEAD,
 				langManager.getRawMessage("gui.invited-count-name"),
 				langManager.getRawMessageList("gui.invited-count-lore", Map.of("%count%", String.valueOf(invitedCount)))
 		));
-
 		List<String> usedCodeLore = usedCode == null
 				? langManager.getRawMessageList("gui.used-code-none-lore", Map.of())
 				: langManager.getRawMessageList("gui.used-code-exists-lore", Map.of("%code%", usedCode));
-
-		inventory.setItem(15, createItem(
+		inventory.setItem(guiConfigManager.getInt("main.used-code.slot", 15), createItem(
 				Material.BOOK,
 				langManager.getRawMessage("gui.used-code-name"),
 				usedCodeLore
 		));
 
-		inventory.setItem(22, createItem(
+		inventory.setItem(guiConfigManager.getInt("main.help.slot", 22), createItem(
 				Material.PAPER,
 				langManager.getRawMessage("gui.help-name"),
 				langManager.getRawMessageList("gui.help-lore", Map.of())
@@ -97,11 +93,12 @@ public class GuiManager {
 	public void openPromotedPlayersGui(Player player, int page) {
 		List<UUID> promotedPlayerUuids = dataManager.getPromotedPlayerUuids(player.getUniqueId());
 
-		int maxPage = getMaxPage(promotedPlayerUuids.size());
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int itemsPerPage = contentSlots.size();
+		int maxPage = getMaxPage(promotedPlayerUuids.size(), itemsPerPage);
 		page = clampPage(page, maxPage);
-
-		int startIndex = page * ITEMS_PER_PAGE;
-		int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, promotedPlayerUuids.size());
+		int startIndex = page * itemsPerPage;
+		int endIndex = Math.min(startIndex + itemsPerPage, promotedPlayerUuids.size());
 
 		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
 				ChadPromoterGuiHolder.GuiType.PROMOTED_LIST,
@@ -127,7 +124,7 @@ public class GuiManager {
 				UUID promotedPlayerUuid = promotedPlayerUuids.get(index);
 				String playerName = dataManager.getPlayerName(promotedPlayerUuid);
 
-				inventory.setItem(index - startIndex, createPlayerHeadItem(
+				inventory.setItem(contentSlots.get(index - startIndex), createPlayerHeadItem(
 						promotedPlayerUuid,
 						langManager.getRawMessage("gui.promoted-player-name", Map.of("%player%", playerName)),
 						langManager.getRawMessageList(
@@ -142,21 +139,21 @@ public class GuiManager {
 		}
 
 		if (page > 0) {
-			inventory.setItem(18, createItem(
+			inventory.setItem(guiConfigManager.getInt("promoted-list.previous-page.slot", 18), createItem(
 					Material.ARROW,
 					langManager.getRawMessage("gui.previous-page-name"),
 					List.of()
 			));
 		}
 
-		inventory.setItem(22, createItem(
+		inventory.setItem(guiConfigManager.getInt("promoted-list.back.slot", 22), createItem(
 				Material.BARRIER,
 				langManager.getRawMessage("gui.back-name"),
 				List.of()
 		));
 
 		if (endIndex < promotedPlayerUuids.size()) {
-			inventory.setItem(26, createItem(
+			inventory.setItem(guiConfigManager.getInt("promoted-list.next-page.slot", 26), createItem(
 					Material.ARROW,
 					langManager.getRawMessage("gui.next-page-name"),
 					List.of()
@@ -173,11 +170,12 @@ public class GuiManager {
 
 		List<RewardDefinition> rewards = new ArrayList<>(rewardManager.getRewards());
 
-		int maxPage = getMaxPage(rewards.size());
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int itemsPerPage = contentSlots.size();
+		int maxPage = getMaxPage(rewards.size(), itemsPerPage);
 		rewardPage = clampPage(rewardPage, maxPage);
-
-		int startIndex = rewardPage * ITEMS_PER_PAGE;
-		int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, rewards.size());
+		int startIndex = rewardPage * itemsPerPage;
+		int endIndex = Math.min(startIndex + itemsPerPage, rewards.size());
 
 		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
 				ChadPromoterGuiHolder.GuiType.REWARD_LIST,
@@ -198,7 +196,7 @@ public class GuiManager {
 		holder.setInventory(inventory);
 
 		for (int index = startIndex; index < endIndex; index++) {
-			int slot = index - startIndex;
+			int slot = contentSlots.get(index - startIndex);
 			RewardDefinition reward = rewards.get(index);
 
 			boolean claimed = dataManager.hasClaimedReward(
@@ -247,21 +245,21 @@ public class GuiManager {
 		}
 
 		if (rewardPage > 0) {
-			inventory.setItem(18, createItem(
+			inventory.setItem(guiConfigManager.getInt("reward-list.previous-page.slot", 18), createItem(
 					Material.ARROW,
 					langManager.getRawMessage("gui.reward-previous-page-name"),
 					List.of()
 			));
 		}
 
-		inventory.setItem(22, createItem(
+		inventory.setItem(guiConfigManager.getInt("reward-list.back.slot", 22), createItem(
 				Material.ARROW,
 				langManager.getRawMessage("gui.reward-back-name"),
 				List.of()
 		));
 
 		if (endIndex < rewards.size()) {
-			inventory.setItem(26, createItem(
+			inventory.setItem(guiConfigManager.getInt("reward-list.next-page.slot", 26), createItem(
 					Material.ARROW,
 					langManager.getRawMessage("gui.reward-next-page-name"),
 					List.of()
@@ -273,12 +271,17 @@ public class GuiManager {
 	}
 
 	public void openRewardListGuiByPromotedListSlot(Player promoter, int promotedListPage, int slot) {
-		if (slot < 0 || slot >= ITEMS_PER_PAGE) {
+		int contentSlotIndex = guiConfigManager.getContentSlotIndex(slot);
+
+		if (contentSlotIndex == -1) {
 			return;
 		}
 
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int itemsPerPage = contentSlots.size();
+
 		List<UUID> promotedPlayerUuids = dataManager.getPromotedPlayerUuids(promoter.getUniqueId());
-		int index = promotedListPage * ITEMS_PER_PAGE + slot;
+		int index = promotedListPage * itemsPerPage + contentSlotIndex;
 
 		if (index < 0 || index >= promotedPlayerUuids.size()) {
 			return;
@@ -293,12 +296,14 @@ public class GuiManager {
 			return;
 		}
 
-		if (slot < 0 || slot >= ITEMS_PER_PAGE) {
+		int contentSlotIndex = guiConfigManager.getContentSlotIndex(slot);
+		if (contentSlotIndex == -1) {
 			return;
 		}
-
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int itemsPerPage = contentSlots.size();
 		List<RewardDefinition> rewards = new ArrayList<>(rewardManager.getRewards());
-		int rewardIndex = rewardPage * ITEMS_PER_PAGE + slot;
+		int rewardIndex = rewardPage * itemsPerPage + contentSlotIndex;
 
 		if (rewardIndex < 0 || rewardIndex >= rewards.size()) {
 			return;
@@ -353,19 +358,14 @@ public class GuiManager {
 	}
 
 	private void fillEmptySlots(Inventory inventory) {
-		FileConfiguration config = plugin.getConfig();
-
-		if (!config.getBoolean("gui.fill-empty-slots", true)) {
+		if (!guiConfigManager.getBoolean("common.fill-empty-slots", true)) {
 			return;
 		}
 
-		Material fillerMaterial = Material.matchMaterial(
-				config.getString("gui.filler-material", "GRAY_STAINED_GLASS_PANE")
+		Material fillerMaterial = guiConfigManager.getMaterial(
+				"common.filler-material",
+				Material.GRAY_STAINED_GLASS_PANE
 		);
-
-		if (fillerMaterial == null) {
-			fillerMaterial = Material.GRAY_STAINED_GLASS_PANE;
-		}
 
 		ItemStack filler = createItem(
 				fillerMaterial,
@@ -380,12 +380,11 @@ public class GuiManager {
 		}
 	}
 
-	private int getMaxPage(int itemCount) {
-		if (itemCount <= 0) {
+	private int getMaxPage(int itemCount, int itemsPerPage) {
+		if (itemCount <= 0 || itemsPerPage <= 0) {
 			return 0;
 		}
-
-		return (itemCount - 1) / ITEMS_PER_PAGE;
+		return (itemCount - 1) / itemsPerPage;
 	}
 
 	private int clampPage(int page, int maxPage) {

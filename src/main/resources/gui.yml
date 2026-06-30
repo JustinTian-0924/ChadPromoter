@@ -1,0 +1,51 @@
+common:
+  fill-empty-slots: true
+  filler-material: "GRAY_STAINED_GLASS_PANE"
+
+  # Content display slots
+  # Use the first 2 lines by default
+  content-slots:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+
+main:
+  my-code:
+    slot: 11
+  invited-count:
+    slot: 13
+  used-code:
+    slot: 15
+  help:
+    slot: 22
+
+promoted-list:
+  previous-page:
+    slot: 18
+  back:
+    slot: 22
+  next-page:
+    slot: 26
+
+reward-list:
+  previous-page:
+    slot: 18
+  back:
+    slot: 22
+  next-page:
+    slot: 26
