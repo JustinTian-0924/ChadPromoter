@@ -42,7 +42,7 @@ use-failed-already-used: "&c你已经使用过 Promotion Code，不能重复绑�
 use-failed-code-not-found: "&c找不到这个 Promotion Code。"
 use-failed-not-new-player: "&c你已经不属于新玩家，不能再使用 Promotion Code。"
 
-reload-success: "&a配置文件、语言文件、奖励文件和 GUI 文件已重新加载。"
+reload-success: "&a配置文件、语言文件、奖励文件、GUI 文件、任务文件和方块追踪数据已重新加载。"
 reload-no-permission: "&c你没有权限使用这个指令。"
 
 time:

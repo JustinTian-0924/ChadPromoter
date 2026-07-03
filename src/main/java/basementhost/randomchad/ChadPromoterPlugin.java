@@ -10,6 +10,10 @@ import basementhost.randomchad.listener.PlayerJoinListener;
 import basementhost.randomchad.listener.PlayerQuitListener;
 import basementhost.randomchad.manager.*;
 import basementhost.randomchad.playtime.PlaytimeManager;
+import basementhost.randomchad.taskmodule.PlacedBlockManager;
+import basementhost.randomchad.taskmodule.TaskManager;
+import basementhost.randomchad.taskmodule.TaskProgressManager;
+import basementhost.randomchad.taskmodule.listener.TaskBlockListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,6 +28,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private PlaytimeManager playtimeManager;
 	private RewardManager rewardManager;
 	private GuiConfigManager guiConfigManager;
+	private TaskManager taskManager;
+	private TaskProgressManager taskProgressManager;
+	private PlacedBlockManager placedBlockManager;
 
 	@Override
 	public void onEnable() {
@@ -35,6 +42,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		this.playtimeManager = new PlaytimeManager(this, dataManager);
 		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
 		this.rewardManager = new RewardManager(this, dataManager);
+		this.taskManager = new TaskManager(this);
+		this.taskProgressManager = new TaskProgressManager(dataManager, taskManager);
+		this.placedBlockManager = new PlacedBlockManager(this);
 		this.guiManager = new GuiManager(
 				dataManager,
 				promoteManager,
@@ -59,6 +69,10 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 			);
 			dataManager.savePlayersData();
 		}
+
+		if (placedBlockManager != null) {
+			placedBlockManager.shutdown();
+		}
 		getLogger().info("ChadPromoter plugin is disabled");
 	}
 
@@ -77,6 +91,11 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				new PlayerQuitListener(dataManager),
 				this
 		);
+
+		getServer().getPluginManager().registerEvents(
+				new TaskBlockListener(taskManager, taskProgressManager, placedBlockManager),
+				this
+		);
 	}
 
 	private void registerCommands() {
@@ -86,7 +105,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				dataManager,
 				playtimeManager,
 				rewardManager,
-				guiConfigManager
+				guiConfigManager,
+				taskManager,
+				placedBlockManager
 		);
 
 		AdminCommandHandler adminCommandHandler = new AdminCommandHandler(
@@ -163,5 +184,17 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public GuiConfigManager getGuiConfigManager() {
 		return guiConfigManager;
+	}
+
+	public TaskManager getTaskManager() {
+		return taskManager;
+	}
+
+	public TaskProgressManager getTaskProgressManager() {
+		return taskProgressManager;
+	}
+
+	public PlacedBlockManager getPlacedBlockManager() {
+		return placedBlockManager;
 	}
 }

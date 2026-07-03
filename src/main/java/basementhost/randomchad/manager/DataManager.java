@@ -276,4 +276,34 @@ public class DataManager {
 
 		return playerNames;
 	}
+
+	public long getTaskConditionProgress(UUID playerUuid, String taskId, String conditionId) {
+		return playersData.getLong(
+				"players." + playerUuid + ".task-progress." + taskId + "." + conditionId,
+				0
+		);
+	}
+
+	public void setTaskConditionProgress(UUID playerUuid, String taskId, String conditionId, long amount) {
+		playersData.set(
+				"players." + playerUuid + ".task-progress." + taskId + "." + conditionId,
+				amount
+		);
+
+		savePlayersData();
+	}
+
+	public boolean hasClaimedSelfReward(UUID playerUuid, String rewardId) {
+		return playersData.getStringList("players." + playerUuid + ".self-claimed-rewards").contains(rewardId);
+	}
+
+	public void addClaimedSelfReward(UUID playerUuid, String rewardId) {
+		List<String> claimedRewards = playersData.getStringList("players." + playerUuid + ".self-claimed-rewards");
+
+		if (!claimedRewards.contains(rewardId)) {
+			claimedRewards.add(rewardId);
+			playersData.set("players." + playerUuid + ".self-claimed-rewards", claimedRewards);
+			savePlayersData();
+		}
+	}
 }

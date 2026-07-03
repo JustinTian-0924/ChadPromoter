@@ -6,3 +6,15 @@ new-player-max-playtime-seconds: 14400
 code:
   length: 8
   characters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+placed-block-tracking:
+  enabled: true
+  ttl-minutes: 1440
+  cleanup-interval-minutes: 30
+  save-immediately: false
+  never-expire-materials:
+    - "DIAMOND_ORE"
+    - "DEEPSLATE_DIAMOND_ORE"
+    - "EMERALD_ORE"
+    - "DEEPSLATE_EMERALD_ORE"
+    - "ANCIENT_DEBRIS"

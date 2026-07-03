@@ -1,0 +1,143 @@
+tasks:
+  mine_diamond_ores:
+    panels:
+      - "PROMOTER"
+      - "SELF"
+    display-name-lang-key: "tasks.mine_diamond_ores.name"
+    lore-lang-key: "tasks.mine_diamond_ores.lore"
+    conditions:
+      mine_diamond_ore:
+        type: "block_break"
+        amount: 8
+        materials:
+          - "DIAMOND_ORE"
+          - "DEEPSLATE_DIAMOND_ORE"
+        count-player-placed: false
+
+  mine_stone_and_granite:
+    panels:
+      - "PROMOTER"
+      - "SELF"
+    display-name-lang-key: "tasks.mine_stone_and_granite.name"
+    lore-lang-key: "tasks.mine_stone_and_granite.lore"
+    conditions:
+      mine_stone:
+        type: "block_break"
+        amount: 64
+        materials:
+          - "STONE"
+        count-player-placed: false
+
+      mine_granite:
+        type: "block_break"
+        amount: 32
+        materials:
+          - "GRANITE"
+        count-player-placed: false
+
+  break_natural_blocks_1000:
+    panels:
+      - "PROMOTER"
+    display-name-lang-key: "tasks.break_natural_blocks_1000.name"
+    lore-lang-key: "tasks.break_natural_blocks_1000.lore"
+    conditions:
+      break_natural_blocks:
+        type: "block_break"
+        amount: 1000
+        materials: []
+        count-player-placed: false
+
+  kill_overworld_hostile_non_spawner:
+    panels:
+      - "PROMOTER"
+      - "SELF"
+    display-name-lang-key: "tasks.kill_overworld_hostile_non_spawner.name"
+    lore-lang-key: "tasks.kill_overworld_hostile_non_spawner.lore"
+    conditions:
+      kill_hostile:
+        type: "mob_kill"
+        amount: 32
+        hostile-only: true
+        world-environment: "NORMAL"
+        count-spawner-mobs: false
+
+  auraskills_total_level_20:
+    panels:
+      - "SELF"
+    display-name-lang-key: "tasks.auraskills_total_level_20.name"
+    lore-lang-key: "tasks.auraskills_total_level_20.lore"
+    conditions:
+      total_level:
+        type: "auraskills_total_level"
+        amount: 20
+
+  auraskills_fighting_5:
+    panels:
+      - "SELF"
+    display-name-lang-key: "tasks.auraskills_fighting_5.name"
+    lore-lang-key: "tasks.auraskills_fighting_5.lore"
+    conditions:
+      fighting_level:
+        type: "auraskills_skill_level"
+        skill: "FIGHTING"
+        amount: 5
+
+  public_chat_50:
+    panels:
+      - "SELF"
+    display-name-lang-key: "tasks.public_chat_50.name"
+    lore-lang-key: "tasks.public_chat_50.lore"
+    conditions:
+      chat:
+        type: "chat"
+        amount: 50
+
+  harvest_wheat_100:
+    panels:
+      - "SELF"
+    display-name-lang-key: "tasks.harvest_wheat_100.name"
+    lore-lang-key: "tasks.harvest_wheat_100.lore"
+    conditions:
+      wheat:
+        type: "crop_harvest"
+        amount: 100
+        materials:
+          - "WHEAT"
+
+  harvest_crops_300:
+    panels:
+      - "SELF"
+    display-name-lang-key: "tasks.harvest_crops_300.name"
+    lore-lang-key: "tasks.harvest_crops_300.lore"
+    conditions:
+      crops:
+        type: "crop_harvest"
+        amount: 300
+        materials:
+          - "WHEAT"
+          - "CARROTS"
+          - "POTATOES"
+          - "BEETROOTS"
+          - "NETHER_WART"
+          - "PUMPKIN"
+          - "MELON"
+
+  swim_1000_blocks:
+    panels:
+      - "SELF"
+    display-name-lang-key: "tasks.swim_1000_blocks.name"
+    lore-lang-key: "tasks.swim_1000_blocks.lore"
+    conditions:
+      swim_distance:
+        type: "swim_distance"
+        amount: 1000
+
+  fish_100:
+    panels:
+      - "SELF"
+    display-name-lang-key: "tasks.fish_100.name"
+    lore-lang-key: "tasks.fish_100.lore"
+    conditions:
+      fish:
+        type: "fish"
+        amount: 100
