@@ -8,9 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class AdminCommandHandler {
 
@@ -125,7 +123,10 @@ public class AdminCommandHandler {
 		}
 
 		if (args.length == 2) {
-			return List.of("info", "resetbind", "resetrewards", "reload");
+			return filterStartsWith(
+					List.of("info", "resetbind", "resetrewards", "reload"),
+					args[1]
+			);
 		}
 
 		if (args.length == 3) {
@@ -136,13 +137,31 @@ public class AdminCommandHandler {
 							|| subCommand.equalsIgnoreCase("resetbind")
 							|| subCommand.equalsIgnoreCase("resetrewards")
 			) {
-				return Bukkit.getOnlinePlayers()
-						.stream()
-						.map(Player::getName)
-						.toList();
+				return filterStartsWith(getKnownAndOnlinePlayerNames(), args[2]);
 			}
 		}
 
 		return List.of();
+	}
+	private List<String> getKnownAndOnlinePlayerNames() {
+		Set<String> playerNames = new LinkedHashSet<>();
+
+		playerNames.addAll(dataManager.getKnownPlayerNames());
+
+		Bukkit.getOnlinePlayers().forEach(player -> playerNames.add(player.getName()));
+
+		return new ArrayList<>(playerNames);
+	}
+
+	private List<String> filterStartsWith(List<String> options, String prefix) {
+		if (prefix == null || prefix.isBlank()) {
+			return options;
+		}
+
+		String lowerPrefix = prefix.toLowerCase();
+
+		return options.stream()
+				.filter(option -> option.toLowerCase().startsWith(lowerPrefix))
+				.toList();
 	}
 }

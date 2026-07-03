@@ -258,4 +258,22 @@ public class DataManager {
 		playersData.set("players." + promotedPlayerUuid + ".claimed-rewards", null);
 		savePlayersData();
 	}
+
+	public List<String> getKnownPlayerNames() {
+		Set<String> playerUuids = playersData.getConfigurationSection("players") == null
+				? Set.of()
+				: playersData.getConfigurationSection("players").getKeys(false);
+
+		List<String> playerNames = new ArrayList<>();
+
+		for (String playerUuid : playerUuids) {
+			String playerName = playersData.getString("players." + playerUuid + ".name");
+
+			if (playerName != null && !playerName.isBlank()) {
+				playerNames.add(playerName);
+			}
+		}
+
+		return playerNames;
+	}
 }

@@ -2,6 +2,7 @@ package basementhost.randomchad;
 
 import basementhost.randomchad.command.AdminCommandHandler;
 import basementhost.randomchad.command.ChadPromoterCommand;
+import basementhost.randomchad.command.PlayerCommandHandler;
 import basementhost.randomchad.command.ReloadCommandHandler;
 import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.listener.GuiClickListener;
@@ -87,19 +88,26 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				rewardManager,
 				guiConfigManager
 		);
+
 		AdminCommandHandler adminCommandHandler = new AdminCommandHandler(
 				langManager,
 				dataManager,
 				playtimeManager,
 				reloadCommandHandler
 		);
-		ChadPromoterCommand command = new ChadPromoterCommand(
+
+		PlayerCommandHandler playerCommandHandler = new PlayerCommandHandler(
 				promoteManager,
 				langManager,
-				guiManager,
+				guiManager
+		);
+
+		ChadPromoterCommand command = new ChadPromoterCommand(
+				playerCommandHandler,
 				adminCommandHandler,
 				reloadCommandHandler
 		);
+
 		if (getCommand("chadpromoter") != null) {
 			getCommand("chadpromoter").setExecutor(command);
 			getCommand("chadpromoter").setTabCompleter(command);
