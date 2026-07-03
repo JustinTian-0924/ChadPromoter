@@ -114,7 +114,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				langManager,
 				dataManager,
 				playtimeManager,
-				reloadCommandHandler
+				reloadCommandHandler,
+				taskManager,
+				taskProgressManager
 		);
 
 		PlayerCommandHandler playerCommandHandler = new PlayerCommandHandler(

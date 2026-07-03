@@ -76,4 +76,8 @@ public class TaskProgressManager {
 
 		return null;
 	}
+
+	public void resetTaskProgress(UUID playerUuid, String taskId) {
+		dataManager.resetTaskProgress(playerUuid, taskId);
+	}
 }

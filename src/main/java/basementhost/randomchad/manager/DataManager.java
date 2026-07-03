@@ -306,4 +306,9 @@ public class DataManager {
 			savePlayersData();
 		}
 	}
+
+	public void resetTaskProgress(UUID playerUuid, String taskId) {
+		playersData.set("players." + playerUuid + ".task-progress." + taskId, null);
+		savePlayersData();
+	}
 }
