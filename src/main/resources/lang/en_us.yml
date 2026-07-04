@@ -109,6 +109,33 @@ gui:
     - "&7Status: Claimed"
   reward-back-name: "&cBack to invited players"
 
+  self-tasks-name: "&aMy Tasks"
+  self-tasks-locked-name: "&cMy Tasks"
+  self-tasks-lore:
+    - "&7View your own task progress."
+    - "&7After completing tasks, you will be able to claim your own rewards later."
+    - ""
+    - "&eClick to open"
+  self-tasks-locked-lore:
+    - "&7You have not used an invite code yet."
+    - "&7Use an invite code to unlock your own task panel."
+    - ""
+    - "&cLocked"
+  self-task-list-title: "&8My Tasks - Page %page%"
+  self-task-name: "&e%task_id%"
+  self-task-lore:
+    - "&7Task progress:"
+  self-task-condition-line: "&7- %condition_id%: &b%current%&7/&b%required%"
+  self-task-completed-line: ""
+  self-task-completed-status: "&aStatus: Completed"
+  self-task-not-completed-status: "&cStatus: Not completed"
+  self-task-no-tasks-name: "&cNo tasks available"
+  self-task-no-tasks-lore:
+    - "&7There are no SELF panel tasks configured."
+  self-task-previous-page-name: "&ePrevious Page"
+  self-task-next-page-name: "&eNext Page"
+  self-task-back-name: "&cBack to Main Menu"
+
 admin:
   none: "none"
   no-permission: "&cYou do not have permission to use admin commands."

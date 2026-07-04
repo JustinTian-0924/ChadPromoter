@@ -3,6 +3,7 @@ package basementhost.randomchad.manager;
 import basementhost.randomchad.gui.ChadPromoterGuiHolder;
 import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
+import basementhost.randomchad.taskmodule.*;
 import basementhost.randomchad.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -28,6 +29,8 @@ public class GuiManager {
 	private final RewardManager rewardManager;
 	private final PlaytimeManager playtimeManager;
 	private final GuiConfigManager guiConfigManager;
+	private final TaskManager taskManager;
+	private final TaskProgressManager taskProgressManager;
 
 	public GuiManager(
 			DataManager dataManager,
@@ -35,7 +38,9 @@ public class GuiManager {
 			LangManager langManager,
 			RewardManager rewardManager,
 			PlaytimeManager playtimeManager,
-			GuiConfigManager guiConfigManager
+			GuiConfigManager guiConfigManager,
+			TaskManager taskManager,
+			TaskProgressManager taskProgressManager
 	) {
 		this.dataManager = dataManager;
 		this.promoteManager = promoteManager;
@@ -43,6 +48,8 @@ public class GuiManager {
 		this.rewardManager = rewardManager;
 		this.playtimeManager = playtimeManager;
 		this.guiConfigManager = guiConfigManager;
+		this.taskManager = taskManager;
+		this.taskProgressManager = taskProgressManager;
 	}
 
 	public void openMainGui(Player player) {
@@ -78,6 +85,21 @@ public class GuiManager {
 				Material.BOOK,
 				langManager.getRawMessage("gui.used-code-name"),
 				usedCodeLore
+		));
+		boolean hasUsedInviteCode = usedCode != null && !usedCode.isBlank();
+		inventory.setItem(guiConfigManager.getInt("main.self-tasks.slot", 16), createItem(
+				hasUsedInviteCode ? Material.WRITABLE_BOOK : Material.BARRIER,
+				hasUsedInviteCode
+						? langManager.getRawMessage("gui.self-tasks-name")
+						: langManager.getRawMessage("gui.self-tasks-locked-name"),
+				hasUsedInviteCode
+						? langManager.getRawMessageList("gui.self-tasks-lore", Map.of())
+						: langManager.getRawMessageList("gui.self-tasks-locked-lore", Map.of())
+		));
+		inventory.setItem(guiConfigManager.getInt("main.help.slot", 22), createItem(
+				Material.PAPER,
+				langManager.getRawMessage("gui.help-name"),
+				langManager.getRawMessageList("gui.help-lore", Map.of())
 		));
 
 		inventory.setItem(guiConfigManager.getInt("main.help.slot", 22), createItem(
@@ -327,6 +349,123 @@ public class GuiManager {
 		}
 
 		openRewardListGui(promoter, promotedPlayerUuid, rewardPage, promotedListPage);
+	}
+
+	public void openSelfTaskListGui(Player player, int page) {
+		String usedCode = dataManager.getUsedCode(player.getUniqueId());
+
+		if (usedCode == null || usedCode.isBlank()) {
+			openMainGui(player);
+			return;
+		}
+
+		List<TaskDefinition> selfTasks = taskManager.getTasksByPanel(TaskPanelType.SELF);
+
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int itemsPerPage = contentSlots.size();
+
+		int maxPage = getMaxPage(selfTasks.size(), itemsPerPage);
+		page = clampPage(page, maxPage);
+
+		int startIndex = page * itemsPerPage;
+		int endIndex = Math.min(startIndex + itemsPerPage, selfTasks.size());
+
+		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
+				ChadPromoterGuiHolder.GuiType.SELF_TASK_LIST,
+				page
+		);
+
+		Inventory inventory = Bukkit.createInventory(
+				holder,
+				27,
+				langManager.getRawMessage("gui.self-task-list-title", Map.of(
+						"%page%", String.valueOf(page + 1)
+				))
+		);
+
+		holder.setInventory(inventory);
+
+		if (selfTasks.isEmpty()) {
+			inventory.setItem(13, createItem(
+					Material.BARRIER,
+					langManager.getRawMessage("gui.self-task-no-tasks-name"),
+					langManager.getRawMessageList("gui.self-task-no-tasks-lore", Map.of())
+			));
+		} else {
+			for (int index = startIndex; index < endIndex; index++) {
+				TaskDefinition taskDefinition = selfTasks.get(index);
+				int slot = contentSlots.get(index - startIndex);
+
+				inventory.setItem(slot, createSelfTaskItem(player, taskDefinition));
+			}
+		}
+
+		if (page > 0) {
+			inventory.setItem(guiConfigManager.getInt("self-task-list.previous-page.slot", 18), createItem(
+					Material.ARROW,
+					langManager.getRawMessage("gui.self-task-previous-page-name"),
+					List.of()
+			));
+		}
+
+		inventory.setItem(guiConfigManager.getInt("self-task-list.back.slot", 22), createItem(
+				Material.BARRIER,
+				langManager.getRawMessage("gui.self-task-back-name"),
+				List.of()
+		));
+
+		if (endIndex < selfTasks.size()) {
+			inventory.setItem(guiConfigManager.getInt("self-task-list.next-page.slot", 26), createItem(
+					Material.ARROW,
+					langManager.getRawMessage("gui.self-task-next-page-name"),
+					List.of()
+			));
+		}
+
+		fillEmptySlots(inventory);
+		player.openInventory(inventory);
+	}
+
+	private ItemStack createSelfTaskItem(Player player, TaskDefinition taskDefinition) {
+		boolean completed = taskProgressManager.isTaskCompleted(
+				player.getUniqueId(),
+				taskDefinition.getId()
+		);
+
+		Material material = completed ? Material.LIME_DYE : Material.GRAY_DYE;
+
+		List<String> lore = new ArrayList<>(
+				langManager.getRawMessageList("gui.self-task-lore", Map.of())
+		);
+
+		for (TaskCondition condition : taskDefinition.getConditions()) {
+			long current = taskProgressManager.getProgress(
+					player.getUniqueId(),
+					taskDefinition.getId(),
+					condition.getId()
+			);
+
+			lore.add(langManager.getRawMessage("gui.self-task-condition-line", Map.of(
+					"%condition_id%", condition.getId(),
+					"%current%", String.valueOf(current),
+					"%required%", String.valueOf(condition.getAmount())
+			)));
+		}
+
+		lore.add(langManager.getRawMessage("gui.self-task-completed-line"));
+
+		lore.add(completed
+				? langManager.getRawMessage("gui.self-task-completed-status")
+				: langManager.getRawMessage("gui.self-task-not-completed-status")
+		);
+
+		return createItem(
+				material,
+				langManager.getRawMessage("gui.self-task-name", Map.of(
+						"%task_id%", taskDefinition.getId()
+				)),
+				lore
+		);
 	}
 
 	private ItemStack createItem(Material material, String name, List<String> lore) {

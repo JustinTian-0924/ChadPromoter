@@ -46,12 +46,22 @@ public class GuiClickListener implements Listener {
 
 		if (holder.getGuiType() == ChadPromoterGuiHolder.GuiType.REWARD_LIST) {
 			handleRewardListClick(player, event.getSlot(), holder);
+			return;
+		}
+
+		if (holder.getGuiType() == ChadPromoterGuiHolder.GuiType.SELF_TASK_LIST) {
+			handleSelfTaskListClick(player, event.getSlot(), holder.getPage());
 		}
 	}
 
 	private void handleMainGuiClick(Player player, int slot) {
 		if (slot == guiConfigManager.getInt("main.invited-count.slot", 13)) {
 			guiManager.openPromotedPlayersGui(player, 0);
+			return;
+		}
+
+		if (slot == guiConfigManager.getInt("main.self-tasks.slot", 16)) {
+			guiManager.openSelfTaskListGui(player, 0);
 		}
 	}
 
@@ -110,6 +120,22 @@ public class GuiClickListener implements Listener {
 					holder.getParentPage(),
 					slot
 			);
+		}
+	}
+
+	private void handleSelfTaskListClick(Player player, int slot, int page) {
+		if (slot == guiConfigManager.getInt("self-task-list.previous-page.slot", 18) && page > 0) {
+			guiManager.openSelfTaskListGui(player, page - 1);
+			return;
+		}
+
+		if (slot == guiConfigManager.getInt("self-task-list.back.slot", 22)) {
+			guiManager.openMainGui(player);
+			return;
+		}
+
+		if (slot == guiConfigManager.getInt("self-task-list.next-page.slot", 26)) {
+			guiManager.openSelfTaskListGui(player, page + 1);
 		}
 	}
 }

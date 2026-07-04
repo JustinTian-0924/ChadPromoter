@@ -8,7 +8,11 @@ import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.listener.GuiClickListener;
 import basementhost.randomchad.listener.PlayerJoinListener;
 import basementhost.randomchad.listener.PlayerQuitListener;
-import basementhost.randomchad.manager.*;
+import basementhost.randomchad.manager.DataManager;
+import basementhost.randomchad.manager.GuiConfigManager;
+import basementhost.randomchad.manager.GuiManager;
+import basementhost.randomchad.manager.PromoteManager;
+import basementhost.randomchad.manager.RewardManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
 import basementhost.randomchad.taskmodule.PlacedBlockManager;
 import basementhost.randomchad.taskmodule.TaskManager;
@@ -39,19 +43,24 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		this.langManager = new LangManager(this);
 		this.dataManager = new DataManager(this);
 		this.guiConfigManager = new GuiConfigManager(this);
-		this.playtimeManager = new PlaytimeManager(this, dataManager);
-		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
-		this.rewardManager = new RewardManager(this, dataManager);
+
 		this.taskManager = new TaskManager(this);
 		this.taskProgressManager = new TaskProgressManager(dataManager, taskManager);
 		this.placedBlockManager = new PlacedBlockManager(this);
+
+		this.playtimeManager = new PlaytimeManager(this, dataManager);
+		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
+		this.rewardManager = new RewardManager(this, dataManager);
+
 		this.guiManager = new GuiManager(
 				dataManager,
 				promoteManager,
 				langManager,
 				rewardManager,
 				playtimeManager,
-				guiConfigManager
+				guiConfigManager,
+				taskManager,
+				taskProgressManager
 		);
 
 		setupVaultEconomy();
@@ -73,6 +82,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		if (placedBlockManager != null) {
 			placedBlockManager.shutdown();
 		}
+
 		getLogger().info("ChadPromoter plugin is disabled");
 	}
 

@@ -56,6 +56,7 @@ public class ChadPromoterGuiHolder implements InventoryHolder {
 	public enum GuiType {
 		MAIN,
 		PROMOTED_LIST,
-		REWARD_LIST
+		REWARD_LIST,
+		SELF_TASK_LIST
 	}
 }

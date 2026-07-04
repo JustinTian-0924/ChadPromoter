@@ -107,6 +107,33 @@ gui:
     - "&7状态: 已领取"
   reward-back-name: "&c返回邀请列表"
 
+  self-tasks-name: "&a我的任务"
+  self-tasks-locked-name: "&c我的任务"
+  self-tasks-lore:
+    - "&7查看你自己的任务进度。"
+    - "&7完成任务后，之后可以领取自己的奖励。"
+    - ""
+    - "&e点击打开"
+  self-tasks-locked-lore:
+    - "&7你还没有使用过邀请码。"
+    - "&7使用邀请码后才会解锁自己的任务面板。"
+    - ""
+    - "&c未解锁"
+  self-task-list-title: "&8我的任务 - 第 %page% 页"
+  self-task-name: "&e%task_id%"
+  self-task-lore:
+    - "&7任务进度："
+  self-task-condition-line: "&7- %condition_id%: &b%current%&7/&b%required%"
+  self-task-completed-line: ""
+  self-task-completed-status: "&a状态：已完成"
+  self-task-not-completed-status: "&c状态：未完成"
+  self-task-no-tasks-name: "&c没有可用任务"
+  self-task-no-tasks-lore:
+    - "&7当前没有配置 SELF 面板任务。"
+  self-task-previous-page-name: "&e上一页"
+  self-task-next-page-name: "&e下一页"
+  self-task-back-name: "&c返回主菜单"
+
 admin:
   none: "无"
   no-permission: "&c你没有权限使用管理员指令。"
