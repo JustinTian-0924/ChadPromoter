@@ -1,11 +1,7 @@
 package basementhost.randomchad.taskmodule.listener;
 
-import basementhost.randomchad.taskmodule.PlacedBlockManager;
-import basementhost.randomchad.taskmodule.TaskCondition;
-import basementhost.randomchad.taskmodule.TaskConditionType;
-import basementhost.randomchad.taskmodule.TaskDefinition;
-import basementhost.randomchad.taskmodule.TaskManager;
-import basementhost.randomchad.taskmodule.TaskProgressManager;
+import basementhost.randomchad.taskmodule.*;
+import basementhost.randomchad.taskmodule.TaskNotificationManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -19,15 +15,18 @@ public class TaskBlockListener implements Listener {
 	private final TaskManager taskManager;
 	private final TaskProgressManager taskProgressManager;
 	private final PlacedBlockManager placedBlockManager;
+	private final TaskNotificationManager taskNotificationManager;
 
 	public TaskBlockListener(
 			TaskManager taskManager,
 			TaskProgressManager taskProgressManager,
-			PlacedBlockManager placedBlockManager
+			PlacedBlockManager placedBlockManager,
+			TaskNotificationManager taskNotificationManager
 	) {
 		this.taskManager = taskManager;
 		this.taskProgressManager = taskProgressManager;
 		this.placedBlockManager = placedBlockManager;
+		this.taskNotificationManager = taskNotificationManager;
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -57,12 +56,15 @@ public class TaskBlockListener implements Listener {
 					continue;
 				}
 
-				taskProgressManager.addProgress(
+				boolean completedNow = taskProgressManager.addProgress(
 						player.getUniqueId(),
 						taskDefinition.getId(),
 						condition.getId(),
 						1
 				);
+				if (completedNow) {
+					taskNotificationManager.notifyTaskCompleted(player, taskDefinition);
+				}
 			}
 		}
 

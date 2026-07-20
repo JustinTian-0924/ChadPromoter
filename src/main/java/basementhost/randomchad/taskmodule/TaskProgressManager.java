@@ -18,31 +18,37 @@ public class TaskProgressManager {
 		return dataManager.getTaskConditionProgress(playerUuid, taskId, conditionId);
 	}
 
-	public void addProgress(UUID playerUuid, String taskId, String conditionId, long amount) {
+	public boolean addProgress(UUID playerUuid, String taskId, String conditionId, long amount) {
 		if (amount <= 0) {
-			return;
+			return false;
 		}
 
 		TaskDefinition taskDefinition = taskManager.getTask(taskId);
 
 		if (taskDefinition == null) {
-			return;
+			return false;
 		}
 
 		TaskCondition condition = getCondition(taskDefinition, conditionId);
 
 		if (condition == null) {
-			return;
+			return false;
 		}
+
+		boolean wasCompleted = isTaskCompleted(playerUuid, taskId);
 
 		long current = getProgress(playerUuid, taskId, conditionId);
 
 		if (current >= condition.getAmount()) {
-			return;
+			return false;
 		}
 
 		long newValue = Math.min(current + amount, condition.getAmount());
 		dataManager.setTaskConditionProgress(playerUuid, taskId, conditionId, newValue);
+
+		boolean nowCompleted = isTaskCompleted(playerUuid, taskId);
+
+		return !wasCompleted && nowCompleted;
 	}
 
 	public void setProgress(UUID playerUuid, String taskId, String conditionId, long amount) {

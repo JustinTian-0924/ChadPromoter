@@ -136,6 +136,10 @@ gui:
   self-task-next-page-name: "&eNext Page"
   self-task-back-name: "&cBack to Main Menu"
 
+task-notification:
+  self-unclaimed: "&aYou have &e%count% &aunclaimed personal quest reward(s)."
+  promoter-unclaimed: "&aPlayer &e%player% &acompleted quest(s). You have &e%count% &aunclaimed invite reward(s)."
+
 admin:
   none: "none"
   no-permission: "&cYou do not have permission to use admin commands."

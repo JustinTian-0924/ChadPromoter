@@ -134,6 +134,10 @@ gui:
   self-task-next-page-name: "&e下一页"
   self-task-back-name: "&c返回主菜单"
 
+task-notification:
+  self-unclaimed: "&a你有 &e%count% &a个未领取的个人任务奖励。"
+  promoter-unclaimed: "&a玩家 &e%player% &a完成了任务，你有 &e%count% &a个未领取的邀请奖励。"
+
 admin:
   none: "无"
   no-permission: "&c你没有权限使用管理员指令。"

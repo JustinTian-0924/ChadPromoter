@@ -16,8 +16,10 @@ import basementhost.randomchad.manager.RewardManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
 import basementhost.randomchad.taskmodule.PlacedBlockManager;
 import basementhost.randomchad.taskmodule.TaskManager;
+import basementhost.randomchad.taskmodule.TaskNotificationManager;
 import basementhost.randomchad.taskmodule.TaskProgressManager;
 import basementhost.randomchad.taskmodule.listener.TaskBlockListener;
+import basementhost.randomchad.taskmodule.listener.TaskNotificationListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,6 +37,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private TaskManager taskManager;
 	private TaskProgressManager taskProgressManager;
 	private PlacedBlockManager placedBlockManager;
+	private TaskNotificationManager taskNotificationManager;
 
 	@Override
 	public void onEnable() {
@@ -47,6 +50,13 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		this.taskManager = new TaskManager(this);
 		this.taskProgressManager = new TaskProgressManager(dataManager, taskManager);
 		this.placedBlockManager = new PlacedBlockManager(this);
+		this.taskNotificationManager = new TaskNotificationManager(
+				this,
+				dataManager,
+				langManager,
+				taskManager,
+				taskProgressManager
+		);
 
 		this.playtimeManager = new PlaytimeManager(this, dataManager);
 		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
@@ -103,7 +113,17 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		);
 
 		getServer().getPluginManager().registerEvents(
-				new TaskBlockListener(taskManager, taskProgressManager, placedBlockManager),
+				new TaskBlockListener(
+						taskManager,
+						taskProgressManager,
+						placedBlockManager,
+						taskNotificationManager
+				),
+				this
+		);
+
+		getServer().getPluginManager().registerEvents(
+				new TaskNotificationListener(this, taskNotificationManager),
 				this
 		);
 	}
@@ -208,5 +228,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public PlacedBlockManager getPlacedBlockManager() {
 		return placedBlockManager;
+	}
+
+	public TaskNotificationManager getTaskNotificationManager() {
+		return taskNotificationManager;
 	}
 }
