@@ -31,6 +31,7 @@ public class GuiManager {
 	private final GuiConfigManager guiConfigManager;
 	private final TaskManager taskManager;
 	private final TaskProgressManager taskProgressManager;
+	private final SelfTaskRewardManager selfTaskRewardManager;
 
 	public GuiManager(
 			DataManager dataManager,
@@ -40,7 +41,8 @@ public class GuiManager {
 			PlaytimeManager playtimeManager,
 			GuiConfigManager guiConfigManager,
 			TaskManager taskManager,
-			TaskProgressManager taskProgressManager
+			TaskProgressManager taskProgressManager,
+			SelfTaskRewardManager selfTaskRewardManager
 	) {
 		this.dataManager = dataManager;
 		this.promoteManager = promoteManager;
@@ -50,6 +52,7 @@ public class GuiManager {
 		this.guiConfigManager = guiConfigManager;
 		this.taskManager = taskManager;
 		this.taskProgressManager = taskProgressManager;
+		this.selfTaskRewardManager = selfTaskRewardManager;
 	}
 
 	public void openMainGui(Player player) {
@@ -432,7 +435,26 @@ public class GuiManager {
 				taskDefinition.getId()
 		);
 
-		Material material = completed ? Material.LIME_DYE : Material.GRAY_DYE;
+		boolean hasReward = selfTaskRewardManager.hasReward(taskDefinition.getId());
+
+		boolean claimed = dataManager.hasClaimedSelfReward(
+				player.getUniqueId(),
+				taskDefinition.getId()
+		);
+
+		boolean claimable = completed && hasReward && !claimed;
+
+		Material material;
+
+		if (claimed) {
+			material = Material.CHEST_MINECART;
+		} else if (claimable) {
+			material = Material.CHEST;
+		} else if (completed) {
+			material = Material.LIME_DYE;
+		} else {
+			material = Material.GRAY_DYE;
+		}
 
 		List<String> lore = new ArrayList<>(
 				langManager.getRawMessageList("gui.self-task-lore", Map.of())
@@ -454,10 +476,18 @@ public class GuiManager {
 
 		lore.add(langManager.getRawMessage("gui.self-task-completed-line"));
 
-		lore.add(completed
-				? langManager.getRawMessage("gui.self-task-completed-status")
-				: langManager.getRawMessage("gui.self-task-not-completed-status")
-		);
+		if (claimed) {
+			lore.add(langManager.getRawMessage("gui.self-task-claimed-status"));
+		} else if (claimable) {
+			lore.add(langManager.getRawMessage("gui.self-task-claimable-status"));
+			lore.add(langManager.getRawMessage("gui.self-task-click-to-claim"));
+		} else if (completed && !hasReward) {
+			lore.add(langManager.getRawMessage("gui.self-task-no-reward-status"));
+		} else if (completed) {
+			lore.add(langManager.getRawMessage("gui.self-task-completed-status"));
+		} else {
+			lore.add(langManager.getRawMessage("gui.self-task-not-completed-status"));
+		}
 
 		return createItem(
 				material,
@@ -466,6 +496,29 @@ public class GuiManager {
 				)),
 				lore
 		);
+	}
+
+	public void claimSelfTaskRewardFromGui(Player player, int page, int clickedSlot) {
+		List<TaskDefinition> selfTasks = taskManager.getTasksByPanel(TaskPanelType.SELF);
+
+		int contentSlotIndex = guiConfigManager.getContentSlotIndex(clickedSlot);
+
+		if (contentSlotIndex == -1) {
+			return;
+		}
+
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int taskIndex = page * contentSlots.size() + contentSlotIndex;
+
+		if (taskIndex < 0 || taskIndex >= selfTasks.size()) {
+			return;
+		}
+
+		TaskDefinition taskDefinition = selfTasks.get(taskIndex);
+
+		selfTaskRewardManager.claimReward(player, taskDefinition.getId());
+
+		openSelfTaskListGui(player, page);
 	}
 
 	private ItemStack createItem(Material material, String name, List<String> lore) {

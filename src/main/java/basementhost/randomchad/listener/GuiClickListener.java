@@ -136,6 +136,11 @@ public class GuiClickListener implements Listener {
 
 		if (slot == guiConfigManager.getInt("self-task-list.next-page.slot", 26)) {
 			guiManager.openSelfTaskListGui(player, page + 1);
+			return;
+		}
+
+		if (guiConfigManager.getContentSlotIndex(slot) != -1) {
+			guiManager.claimSelfTaskRewardFromGui(player, page, slot);
 		}
 	}
 }

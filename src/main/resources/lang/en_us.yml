@@ -49,7 +49,14 @@ use-failed-already-used: "&cYou have already used a Promotion Code."
 use-failed-code-not-found: "&cThat Promotion Code does not exist."
 use-failed-not-new-player: "&cYou are no longer considered a new player."
 
-reload-success: "&aConfig, language, rewards, GUI, task files and placed block tracking data reloaded."
+self-task-reward:
+  no-reward-configured: "&cThis task has no personal reward configured."
+  not-completed: "&cYou have not completed this task yet."
+  already-claimed: "&cYou have already claimed this task reward."
+  claim-success: "&aYou claimed the reward for task &e%task_id%&a!"
+  money-received: "&aYou received &e%money% &amoney."
+
+reload-success: "&aConfig, language, rewards, GUI, task files, self task rewards and placed block tracking data reloaded."
 reload-no-permission: "&cYou do not have permission to use this command."
 
 gui:
@@ -57,6 +64,10 @@ gui:
   filler-name: " "
   reward-previous-page-name: "&eLast page"
   reward-next-page-name: "&eNext page"
+  self-task-claimable-status: "&eStatus: Claimable"
+  self-task-claimed-status: "&7Status: Claimed"
+  self-task-no-reward-status: "&cStatus: No reward configured"
+  self-task-click-to-claim: "&eClick to claim reward"
   my-code-name: "&aYour Promotion Code"
   my-code-lore:
     - "&7Your code is:"

@@ -1,0 +1,20 @@
+self-task-rewards:
+  mine_diamond_ores:
+    money: 500
+    commands:
+      - "give %player% diamond 2"
+
+  mine_stone_and_granite:
+    money: 250
+    commands:
+      - "give %player% iron_ingot 8"
+
+  public_chat_50:
+    money: 300
+    commands:
+      - "give %player% emerald 2"
+
+  fish_100:
+    money: 500
+    commands:
+      - "give %player% cooked_cod 16"

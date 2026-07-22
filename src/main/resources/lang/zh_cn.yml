@@ -42,8 +42,15 @@ use-failed-already-used: "&c你已经使用过 Promotion Code，不能重复绑�
 use-failed-code-not-found: "&c找不到这个 Promotion Code。"
 use-failed-not-new-player: "&c你已经不属于新玩家，不能再使用 Promotion Code。"
 
-reload-success: "&a配置文件、语言文件、奖励文件、GUI 文件、任务文件和方块追踪数据已重新加载。"
+reload-success: "&a配置文件、语言文件、奖励文件、GUI 文件、任务文件、个人任务奖励文件和方块追踪数据已重新加载。"
 reload-no-permission: "&c你没有权限使用这个指令。"
+
+self-task-reward:
+  no-reward-configured: "&c这个任务没有配置个人奖励。"
+  not-completed: "&c你还没有完成这个任务，暂时不能领取奖励。"
+  already-claimed: "&c你已经领取过这个任务奖励了。"
+  claim-success: "&a你领取了任务 &e%task_id% &a的奖励！"
+  money-received: "&a你获得了 &e%money% &a金币。"
 
 time:
   hours-minutes: "%hours%小时%minutes%分钟"
@@ -55,6 +62,10 @@ gui:
   filler-name: " "
   reward-previous-page-name: "&e上一页"
   reward-next-page-name: "&e下一页"
+  self-task-claimable-status: "&e状态：可领取"
+  self-task-claimed-status: "&7状态：已领取"
+  self-task-no-reward-status: "&c状态：未配置奖励"
+  self-task-click-to-claim: "&e点击领取奖励"
   my-code-name: "&a你的 Promotion Code"
   my-code-lore:
     - "&7你的邀请码是:"

@@ -14,10 +14,8 @@ import basementhost.randomchad.manager.GuiManager;
 import basementhost.randomchad.manager.PromoteManager;
 import basementhost.randomchad.manager.RewardManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
-import basementhost.randomchad.taskmodule.PlacedBlockManager;
-import basementhost.randomchad.taskmodule.TaskManager;
+import basementhost.randomchad.taskmodule.*;
 import basementhost.randomchad.taskmodule.TaskNotificationManager;
-import basementhost.randomchad.taskmodule.TaskProgressManager;
 import basementhost.randomchad.taskmodule.listener.TaskBlockListener;
 import basementhost.randomchad.taskmodule.listener.TaskNotificationListener;
 import net.milkbowl.vault.economy.Economy;
@@ -38,6 +36,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private TaskProgressManager taskProgressManager;
 	private PlacedBlockManager placedBlockManager;
 	private TaskNotificationManager taskNotificationManager;
+	private SelfTaskRewardManager selfTaskRewardManager;
 
 	@Override
 	public void onEnable() {
@@ -61,7 +60,13 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 		this.playtimeManager = new PlaytimeManager(this, dataManager);
 		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
 		this.rewardManager = new RewardManager(this, dataManager);
-
+		this.selfTaskRewardManager = new SelfTaskRewardManager(
+				this,
+				dataManager,
+				langManager,
+				taskManager,
+				taskProgressManager
+		);
 		this.guiManager = new GuiManager(
 				dataManager,
 				promoteManager,
@@ -70,7 +75,8 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				playtimeManager,
 				guiConfigManager,
 				taskManager,
-				taskProgressManager
+				taskProgressManager,
+				selfTaskRewardManager
 		);
 
 		setupVaultEconomy();
@@ -137,7 +143,8 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				rewardManager,
 				guiConfigManager,
 				taskManager,
-				placedBlockManager
+				placedBlockManager,
+				selfTaskRewardManager
 		);
 
 		AdminCommandHandler adminCommandHandler = new AdminCommandHandler(
@@ -232,5 +239,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public TaskNotificationManager getTaskNotificationManager() {
 		return taskNotificationManager;
+	}
+
+	public SelfTaskRewardManager getSelfTaskRewardManager() {
+		return selfTaskRewardManager;
 	}
 }
