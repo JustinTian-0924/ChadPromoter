@@ -56,6 +56,14 @@ self-task-reward:
   claim-success: "&aYou claimed the reward for task &e%task_id%&a!"
   money-received: "&aYou received &e%money% &amoney."
 
+promoter-task-reward:
+  no-reward-configured: "&cThis task has no promoter reward configured."
+  not-completed: "&cThe invited player has not completed this task yet."
+  already-claimed: "&cYou have already claimed this task reward for this invited player."
+  claim-success: "&aYou claimed the invite reward from &e%promoted% &acompleting task &e%task_id%&a!"
+  money-received: "&aYou received &e%money% &amoney."
+  not-your-promoted-player: "&cThis player was not invited by you."
+
 reload-success: "&aConfig, language, rewards, GUI, task files, self task rewards and placed block tracking data reloaded."
 reload-no-permission: "&cYou do not have permission to use this command."
 
@@ -68,6 +76,17 @@ gui:
   self-task-claimed-status: "&7Status: Claimed"
   self-task-no-reward-status: "&cStatus: No reward configured"
   self-task-click-to-claim: "&eClick to claim reward"
+  promoter-task-reward-name: "&eTask Reward: %task_id%"
+  promoter-task-reward-lore:
+    - "&7Invited player: &e%promoted%"
+    - ""
+    - "&7Task progress:"
+  promoter-task-reward-condition-line: "&7- %condition_id%: &b%current%&7/&b%required%"
+  promoter-task-reward-claimable-status: "&eStatus: Claimable"
+  promoter-task-reward-claimed-status: "&7Status: Claimed"
+  promoter-task-reward-not-completed-status: "&cStatus: Not completed"
+  promoter-task-reward-no-config-status: "&cStatus: No reward configured"
+  promoter-task-reward-click-to-claim: "&eClick to claim reward"
   my-code-name: "&aYour Promotion Code"
   my-code-lore:
     - "&7Your code is:"

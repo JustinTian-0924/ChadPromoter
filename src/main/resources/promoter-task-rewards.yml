@@ -1,0 +1,20 @@
+promoter-task-rewards:
+  mine_diamond_ores:
+    money: 1000
+    commands:
+      - "give %promoter% diamond 3"
+
+  mine_stone_and_granite:
+    money: 500
+    commands:
+      - "give %promoter% iron_ingot 16"
+
+  break_natural_blocks_1000:
+    money: 1500
+    commands:
+      - "give %promoter% emerald 5"
+
+  kill_overworld_hostile_non_spawner:
+    money: 2000
+    commands:
+      - "give %promoter% diamond 2"

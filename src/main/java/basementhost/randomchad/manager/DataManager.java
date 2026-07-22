@@ -210,9 +210,21 @@ public class DataManager {
 		return totalPlaytimeSeconds + currentSessionSeconds;
 	}
 
-	public boolean hasClaimedReward(UUID promoterUuid, UUID promotedPlayerUuid, String rewardId) {
-		String path = "players." + promotedPlayerUuid + ".claimed-rewards." + promoterUuid;
-		return playersData.getStringList(path).contains(rewardId);
+	public boolean hasClaimedReward(UUID promoterUuid, UUID promotedPlayerUuid, String taskId) {
+		return playersData.getStringList(
+				"players." + promoterUuid + ".claimed-task-rewards." + promotedPlayerUuid
+		).contains(taskId);
+	}
+
+	public void addClaimedReward(UUID promoterUuid, UUID promotedPlayerUuid, String taskId) {
+		String path = "players." + promoterUuid + ".claimed-task-rewards." + promotedPlayerUuid;
+		List<String> claimedRewards = playersData.getStringList(path);
+
+		if (!claimedRewards.contains(taskId)) {
+			claimedRewards.add(taskId);
+			playersData.set(path, claimedRewards);
+			savePlayersData();
+		}
 	}
 
 	public void markRewardClaimed(UUID promoterUuid, UUID promotedPlayerUuid, String rewardId) {
@@ -311,4 +323,6 @@ public class DataManager {
 		playersData.set("players." + playerUuid + ".task-progress." + taskId, null);
 		savePlayersData();
 	}
+
+
 }

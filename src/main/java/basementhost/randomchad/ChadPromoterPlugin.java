@@ -37,6 +37,7 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 	private PlacedBlockManager placedBlockManager;
 	private TaskNotificationManager taskNotificationManager;
 	private SelfTaskRewardManager selfTaskRewardManager;
+	private PromoterTaskRewardManager promoterTaskRewardManager;
 
 	@Override
 	public void onEnable() {
@@ -56,6 +57,14 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				taskManager,
 				taskProgressManager
 		);
+		this.promoterTaskRewardManager = new PromoterTaskRewardManager(
+				this,
+				dataManager,
+				langManager,
+				taskManager,
+				taskProgressManager
+		);
+
 
 		this.playtimeManager = new PlaytimeManager(this, dataManager);
 		this.promoteManager = new PromoteManager(this, dataManager, playtimeManager);
@@ -76,7 +85,8 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				guiConfigManager,
 				taskManager,
 				taskProgressManager,
-				selfTaskRewardManager
+				selfTaskRewardManager,
+				promoterTaskRewardManager
 		);
 
 		setupVaultEconomy();
@@ -144,7 +154,8 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 				guiConfigManager,
 				taskManager,
 				placedBlockManager,
-				selfTaskRewardManager
+				selfTaskRewardManager,
+				promoterTaskRewardManager
 		);
 
 		AdminCommandHandler adminCommandHandler = new AdminCommandHandler(
@@ -243,5 +254,9 @@ public final class ChadPromoterPlugin extends JavaPlugin {
 
 	public SelfTaskRewardManager getSelfTaskRewardManager() {
 		return selfTaskRewardManager;
+	}
+
+	public PromoterTaskRewardManager getPromoterTaskRewardManager() {
+		return promoterTaskRewardManager;
 	}
 }

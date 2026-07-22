@@ -3,18 +3,21 @@ package basementhost.randomchad.manager;
 import basementhost.randomchad.gui.ChadPromoterGuiHolder;
 import basementhost.randomchad.lang.LangManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
-import basementhost.randomchad.taskmodule.*;
-import basementhost.randomchad.util.TimeUtil;
+import basementhost.randomchad.taskmodule.PromoterTaskRewardManager;
+import basementhost.randomchad.taskmodule.SelfTaskRewardManager;
+import basementhost.randomchad.taskmodule.TaskCondition;
+import basementhost.randomchad.taskmodule.TaskDefinition;
+import basementhost.randomchad.taskmodule.TaskManager;
+import basementhost.randomchad.taskmodule.TaskPanelType;
+import basementhost.randomchad.taskmodule.TaskProgressManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,7 @@ public class GuiManager {
 	private final TaskManager taskManager;
 	private final TaskProgressManager taskProgressManager;
 	private final SelfTaskRewardManager selfTaskRewardManager;
+	private final PromoterTaskRewardManager promoterTaskRewardManager;
 
 	public GuiManager(
 			DataManager dataManager,
@@ -42,7 +46,8 @@ public class GuiManager {
 			GuiConfigManager guiConfigManager,
 			TaskManager taskManager,
 			TaskProgressManager taskProgressManager,
-			SelfTaskRewardManager selfTaskRewardManager
+			SelfTaskRewardManager selfTaskRewardManager,
+			PromoterTaskRewardManager promoterTaskRewardManager
 	) {
 		this.dataManager = dataManager;
 		this.promoteManager = promoteManager;
@@ -53,6 +58,7 @@ public class GuiManager {
 		this.taskManager = taskManager;
 		this.taskProgressManager = taskProgressManager;
 		this.selfTaskRewardManager = selfTaskRewardManager;
+		this.promoterTaskRewardManager = promoterTaskRewardManager;
 	}
 
 	public void openMainGui(Player player) {
@@ -60,7 +66,10 @@ public class GuiManager {
 		int invitedCount = dataManager.getPromotedPlayerCount(player.getUniqueId());
 		String usedCode = dataManager.getUsedCode(player.getUniqueId());
 
-		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(ChadPromoterGuiHolder.GuiType.MAIN, 0);
+		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
+				ChadPromoterGuiHolder.GuiType.MAIN,
+				0
+		);
 
 		Inventory inventory = Bukkit.createInventory(
 				holder,
@@ -73,23 +82,33 @@ public class GuiManager {
 		inventory.setItem(guiConfigManager.getInt("main.my-code.slot", 11), createPlayerHeadItem(
 				player.getUniqueId(),
 				langManager.getRawMessage("gui.my-code-name"),
-				langManager.getRawMessageList("gui.my-code-lore", Map.of("%code%", code))
+				langManager.getRawMessageList("gui.my-code-lore", Map.of(
+						"%code%", code
+				))
 		));
 
 		inventory.setItem(guiConfigManager.getInt("main.invited-count.slot", 13), createItem(
 				Material.PLAYER_HEAD,
 				langManager.getRawMessage("gui.invited-count-name"),
-				langManager.getRawMessageList("gui.invited-count-lore", Map.of("%count%", String.valueOf(invitedCount)))
+				langManager.getRawMessageList("gui.invited-count-lore", Map.of(
+						"%count%", String.valueOf(invitedCount)
+				))
 		));
-		List<String> usedCodeLore = usedCode == null
+
+		List<String> usedCodeLore = usedCode == null || usedCode.isBlank()
 				? langManager.getRawMessageList("gui.used-code-none-lore", Map.of())
-				: langManager.getRawMessageList("gui.used-code-exists-lore", Map.of("%code%", usedCode));
+				: langManager.getRawMessageList("gui.used-code-exists-lore", Map.of(
+				"%code%", usedCode
+		));
+
 		inventory.setItem(guiConfigManager.getInt("main.used-code.slot", 15), createItem(
 				Material.BOOK,
 				langManager.getRawMessage("gui.used-code-name"),
 				usedCodeLore
 		));
+
 		boolean hasUsedInviteCode = usedCode != null && !usedCode.isBlank();
+
 		inventory.setItem(guiConfigManager.getInt("main.self-tasks.slot", 16), createItem(
 				hasUsedInviteCode ? Material.WRITABLE_BOOK : Material.BARRIER,
 				hasUsedInviteCode
@@ -98,11 +117,6 @@ public class GuiManager {
 				hasUsedInviteCode
 						? langManager.getRawMessageList("gui.self-tasks-lore", Map.of())
 						: langManager.getRawMessageList("gui.self-tasks-locked-lore", Map.of())
-		));
-		inventory.setItem(guiConfigManager.getInt("main.help.slot", 22), createItem(
-				Material.PAPER,
-				langManager.getRawMessage("gui.help-name"),
-				langManager.getRawMessageList("gui.help-lore", Map.of())
 		));
 
 		inventory.setItem(guiConfigManager.getInt("main.help.slot", 22), createItem(
@@ -120,8 +134,10 @@ public class GuiManager {
 
 		List<Integer> contentSlots = guiConfigManager.getContentSlots();
 		int itemsPerPage = contentSlots.size();
+
 		int maxPage = getMaxPage(promotedPlayerUuids.size(), itemsPerPage);
 		page = clampPage(page, maxPage);
+
 		int startIndex = page * itemsPerPage;
 		int endIndex = Math.min(startIndex + itemsPerPage, promotedPlayerUuids.size());
 
@@ -133,7 +149,9 @@ public class GuiManager {
 		Inventory inventory = Bukkit.createInventory(
 				holder,
 				27,
-				langManager.getRawMessage("gui.promoted-list-title", Map.of("%page%", String.valueOf(page + 1)))
+				langManager.getRawMessage("gui.promoted-list-title", Map.of(
+						"%page%", String.valueOf(page + 1)
+				))
 		);
 
 		holder.setInventory(inventory);
@@ -151,14 +169,13 @@ public class GuiManager {
 
 				inventory.setItem(contentSlots.get(index - startIndex), createPlayerHeadItem(
 						promotedPlayerUuid,
-						langManager.getRawMessage("gui.promoted-player-name", Map.of("%player%", playerName)),
-						langManager.getRawMessageList(
-								"gui.promoted-player-lore",
-								Map.of(
-										"%player%", playerName,
-										"%uuid%", promotedPlayerUuid.toString()
-								)
-						)
+						langManager.getRawMessage("gui.promoted-player-name", Map.of(
+								"%player%", playerName
+						)),
+						langManager.getRawMessageList("gui.promoted-player-lore", Map.of(
+								"%player%", playerName,
+								"%uuid%", promotedPlayerUuid.toString()
+						))
 				));
 			}
 		}
@@ -191,16 +208,17 @@ public class GuiManager {
 
 	public void openRewardListGui(Player promoter, UUID promotedPlayerUuid, int rewardPage, int promotedListPage) {
 		String promotedPlayerName = dataManager.getPlayerName(promotedPlayerUuid);
-		long promotedPlaytimeSeconds = playtimeManager.getPlaytimeSeconds(promotedPlayerUuid);
 
-		List<RewardDefinition> rewards = new ArrayList<>(rewardManager.getRewards());
+		List<TaskDefinition> promoterTasks = taskManager.getTasksByPanel(TaskPanelType.PROMOTER);
 
 		List<Integer> contentSlots = guiConfigManager.getContentSlots();
 		int itemsPerPage = contentSlots.size();
-		int maxPage = getMaxPage(rewards.size(), itemsPerPage);
+
+		int maxPage = getMaxPage(promoterTasks.size(), itemsPerPage);
 		rewardPage = clampPage(rewardPage, maxPage);
+
 		int startIndex = rewardPage * itemsPerPage;
-		int endIndex = Math.min(startIndex + itemsPerPage, rewards.size());
+		int endIndex = Math.min(startIndex + itemsPerPage, promoterTasks.size());
 
 		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
 				ChadPromoterGuiHolder.GuiType.REWARD_LIST,
@@ -212,61 +230,29 @@ public class GuiManager {
 		Inventory inventory = Bukkit.createInventory(
 				holder,
 				27,
-				langManager.getRawMessage(
-						"gui.reward-list-title",
-						Map.of("%player%", promotedPlayerName)
-				)
+				langManager.getRawMessage("gui.reward-list-title", Map.of(
+						"%player%", promotedPlayerName
+				))
 		);
 
 		holder.setInventory(inventory);
 
-		for (int index = startIndex; index < endIndex; index++) {
-			int slot = contentSlots.get(index - startIndex);
-			RewardDefinition reward = rewards.get(index);
-
-			boolean claimed = dataManager.hasClaimedReward(
-					promoter.getUniqueId(),
-					promotedPlayerUuid,
-					reward.getId()
-			);
-
-			boolean unlocked = rewardManager.isUnlocked(
-					reward,
-					promotedPlayerUuid,
-					promotedPlaytimeSeconds
-			);
-
-			List<String> lore = new ArrayList<>(
-					langManager.getRawMessageList(reward.getLoreLangKey(), Map.of(
-							"%current_playtime%", TimeUtil.formatSeconds(langManager, promotedPlaytimeSeconds),
-							"%required_playtime%", TimeUtil.formatSeconds(langManager, reward.getRequiredPlaytimeSeconds())
-					))
-			);
-
-			if (claimed) {
-				lore.addAll(langManager.getRawMessageList("gui.reward-claimed-lore", Map.of()));
-			} else if (unlocked) {
-				lore.addAll(langManager.getRawMessageList("gui.reward-available-lore", Map.of()));
-			} else {
-				lore.addAll(langManager.getRawMessageList("gui.reward-locked-lore", Map.of(
-						"%current_playtime%", TimeUtil.formatSeconds(langManager, promotedPlaytimeSeconds),
-						"%required_playtime%", TimeUtil.formatSeconds(langManager, reward.getRequiredPlaytimeSeconds())
-				)));
-			}
-
-			Material material = reward.getMaterial();
-
-			if (claimed) {
-				material = Material.BARRIER;
-			} else if (!unlocked) {
-				material = Material.GRAY_DYE;
-			}
-
-			inventory.setItem(slot, createItem(
-					material,
-					langManager.getRawMessage(reward.getDisplayNameLangKey()),
-					lore
+		if (promoterTasks.isEmpty()) {
+			inventory.setItem(13, createItem(
+					Material.BARRIER,
+					langManager.getRawMessage("gui.self-task-no-tasks-name"),
+					langManager.getRawMessageList("gui.self-task-no-tasks-lore", Map.of())
 			));
+		} else {
+			for (int index = startIndex; index < endIndex; index++) {
+				TaskDefinition taskDefinition = promoterTasks.get(index);
+				int slot = contentSlots.get(index - startIndex);
+
+				inventory.setItem(
+						slot,
+						createPromoterTaskRewardItem(promoter, promotedPlayerUuid, taskDefinition)
+				);
+			}
 		}
 
 		if (rewardPage > 0) {
@@ -283,7 +269,7 @@ public class GuiManager {
 				List.of()
 		));
 
-		if (endIndex < rewards.size()) {
+		if (endIndex < promoterTasks.size()) {
 			inventory.setItem(guiConfigManager.getInt("reward-list.next-page.slot", 26), createItem(
 					Material.ARROW,
 					langManager.getRawMessage("gui.reward-next-page-name"),
@@ -316,42 +302,103 @@ public class GuiManager {
 		openRewardListGui(promoter, promotedPlayerUuid, 0, promotedListPage);
 	}
 
-	public void claimRewardFromGui(Player promoter, UUID promotedPlayerUuid, int rewardPage, int promotedListPage, int slot) {
-		if (promotedPlayerUuid == null) {
-			return;
-		}
+	public void claimRewardFromGui(Player promoter, UUID promotedPlayerUuid, int page, int parentPage, int clickedSlot) {
+		List<TaskDefinition> promoterTasks = taskManager.getTasksByPanel(TaskPanelType.PROMOTER);
 
-		int contentSlotIndex = guiConfigManager.getContentSlotIndex(slot);
+		int contentSlotIndex = guiConfigManager.getContentSlotIndex(clickedSlot);
+
 		if (contentSlotIndex == -1) {
 			return;
 		}
-		List<Integer> contentSlots = guiConfigManager.getContentSlots();
-		int itemsPerPage = contentSlots.size();
-		List<RewardDefinition> rewards = new ArrayList<>(rewardManager.getRewards());
-		int rewardIndex = rewardPage * itemsPerPage + contentSlotIndex;
 
-		if (rewardIndex < 0 || rewardIndex >= rewards.size()) {
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int taskIndex = page * contentSlots.size() + contentSlotIndex;
+
+		if (taskIndex < 0 || taskIndex >= promoterTasks.size()) {
 			return;
 		}
 
-		RewardDefinition reward = rewards.get(rewardIndex);
-		long promotedPlaytimeSeconds = playtimeManager.getPlaytimeSeconds(promotedPlayerUuid);
+		TaskDefinition taskDefinition = promoterTasks.get(taskIndex);
 
-		RewardManager.ClaimResult result = rewardManager.claimReward(
-				promoter.getUniqueId(),
+		promoterTaskRewardManager.claimReward(
+				promoter,
 				promotedPlayerUuid,
-				reward,
-				promotedPlaytimeSeconds
+				taskDefinition.getId()
 		);
 
-		switch (result) {
-			case SUCCESS -> langManager.sendMessage(promoter, "reward.claimed");
-			case ALREADY_CLAIMED -> langManager.sendMessage(promoter, "reward.already-claimed");
-			case NOT_UNLOCKED -> langManager.sendMessage(promoter, "reward.not-unlocked");
-			case VAULT_UNAVAILABLE -> langManager.sendMessage(promoter, "reward.vault-unavailable");
+		openRewardListGui(promoter, promotedPlayerUuid, page, parentPage);
+	}
+
+	private ItemStack createPromoterTaskRewardItem(Player promoter, UUID promotedPlayerUuid, TaskDefinition taskDefinition) {
+		boolean completed = taskProgressManager.isTaskCompleted(
+				promotedPlayerUuid,
+				taskDefinition.getId()
+		);
+
+		boolean hasReward = promoterTaskRewardManager.hasReward(taskDefinition.getId());
+
+		boolean claimed = dataManager.hasClaimedReward(
+				promoter.getUniqueId(),
+				promotedPlayerUuid,
+				taskDefinition.getId()
+		);
+
+		boolean claimable = completed && hasReward && !claimed;
+
+		Material material;
+
+		if (claimed) {
+			material = Material.CHEST_MINECART;
+		} else if (claimable) {
+			material = Material.CHEST;
+		} else if (completed) {
+			material = Material.LIME_DYE;
+		} else {
+			material = Material.GRAY_DYE;
 		}
 
-		openRewardListGui(promoter, promotedPlayerUuid, rewardPage, promotedListPage);
+		String promotedName = dataManager.getPlayerName(promotedPlayerUuid);
+
+		List<String> lore = new ArrayList<>(
+				langManager.getRawMessageList("gui.promoter-task-reward-lore", Map.of(
+						"%promoted%", promotedName
+				))
+		);
+
+		for (TaskCondition condition : taskDefinition.getConditions()) {
+			long current = taskProgressManager.getProgress(
+					promotedPlayerUuid,
+					taskDefinition.getId(),
+					condition.getId()
+			);
+
+			lore.add(langManager.getRawMessage("gui.promoter-task-reward-condition-line", Map.of(
+					"%condition_id%", condition.getId(),
+					"%current%", String.valueOf(current),
+					"%required%", String.valueOf(condition.getAmount())
+			)));
+		}
+
+		lore.add("");
+
+		if (claimed) {
+			lore.add(langManager.getRawMessage("gui.promoter-task-reward-claimed-status"));
+		} else if (claimable) {
+			lore.add(langManager.getRawMessage("gui.promoter-task-reward-claimable-status"));
+			lore.add(langManager.getRawMessage("gui.promoter-task-reward-click-to-claim"));
+		} else if (completed && !hasReward) {
+			lore.add(langManager.getRawMessage("gui.promoter-task-reward-no-config-status"));
+		} else {
+			lore.add(langManager.getRawMessage("gui.promoter-task-reward-not-completed-status"));
+		}
+
+		return createItem(
+				material,
+				langManager.getRawMessage("gui.promoter-task-reward-name", Map.of(
+						"%task_id%", taskDefinition.getId()
+				)),
+				lore
+		);
 	}
 
 	public void openSelfTaskListGui(Player player, int page) {
@@ -429,6 +476,29 @@ public class GuiManager {
 		player.openInventory(inventory);
 	}
 
+	public void claimSelfTaskRewardFromGui(Player player, int page, int clickedSlot) {
+		List<TaskDefinition> selfTasks = taskManager.getTasksByPanel(TaskPanelType.SELF);
+
+		int contentSlotIndex = guiConfigManager.getContentSlotIndex(clickedSlot);
+
+		if (contentSlotIndex == -1) {
+			return;
+		}
+
+		List<Integer> contentSlots = guiConfigManager.getContentSlots();
+		int taskIndex = page * contentSlots.size() + contentSlotIndex;
+
+		if (taskIndex < 0 || taskIndex >= selfTasks.size()) {
+			return;
+		}
+
+		TaskDefinition taskDefinition = selfTasks.get(taskIndex);
+
+		selfTaskRewardManager.claimReward(player, taskDefinition.getId());
+
+		openSelfTaskListGui(player, page);
+	}
+
 	private ItemStack createSelfTaskItem(Player player, TaskDefinition taskDefinition) {
 		boolean completed = taskProgressManager.isTaskCompleted(
 				player.getUniqueId(),
@@ -498,29 +568,6 @@ public class GuiManager {
 		);
 	}
 
-	public void claimSelfTaskRewardFromGui(Player player, int page, int clickedSlot) {
-		List<TaskDefinition> selfTasks = taskManager.getTasksByPanel(TaskPanelType.SELF);
-
-		int contentSlotIndex = guiConfigManager.getContentSlotIndex(clickedSlot);
-
-		if (contentSlotIndex == -1) {
-			return;
-		}
-
-		List<Integer> contentSlots = guiConfigManager.getContentSlots();
-		int taskIndex = page * contentSlots.size() + contentSlotIndex;
-
-		if (taskIndex < 0 || taskIndex >= selfTasks.size()) {
-			return;
-		}
-
-		TaskDefinition taskDefinition = selfTasks.get(taskIndex);
-
-		selfTaskRewardManager.claimReward(player, taskDefinition.getId());
-
-		openSelfTaskListGui(player, page);
-	}
-
 	private ItemStack createItem(Material material, String name, List<String> lore) {
 		ItemStack itemStack = new ItemStack(material);
 		ItemMeta itemMeta = itemStack.getItemMeta();
@@ -576,6 +623,7 @@ public class GuiManager {
 		if (itemCount <= 0 || itemsPerPage <= 0) {
 			return 0;
 		}
+
 		return (itemCount - 1) / itemsPerPage;
 	}
 

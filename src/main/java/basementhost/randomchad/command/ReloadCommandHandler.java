@@ -6,6 +6,7 @@ import basementhost.randomchad.manager.GuiConfigManager;
 import basementhost.randomchad.manager.RewardManager;
 import basementhost.randomchad.playtime.PlaytimeManager;
 import basementhost.randomchad.taskmodule.PlacedBlockManager;
+import basementhost.randomchad.taskmodule.PromoterTaskRewardManager;
 import basementhost.randomchad.taskmodule.SelfTaskRewardManager;
 import basementhost.randomchad.taskmodule.TaskManager;
 import org.bukkit.command.CommandSender;
@@ -22,6 +23,7 @@ public class ReloadCommandHandler {
 	private final TaskManager taskManager;
 	private final PlacedBlockManager placedBlockManager;
 	private final SelfTaskRewardManager selfTaskRewardManager;
+	private final PromoterTaskRewardManager promoterTaskRewardManager;
 
 	public ReloadCommandHandler(
 			JavaPlugin plugin,
@@ -32,7 +34,8 @@ public class ReloadCommandHandler {
 			GuiConfigManager guiConfigManager,
 			TaskManager taskManager,
 			PlacedBlockManager placedBlockManager,
-			SelfTaskRewardManager selfTaskRewardManager
+			SelfTaskRewardManager selfTaskRewardManager,
+			PromoterTaskRewardManager promoterTaskRewardManager
 	) {
 		this.plugin = plugin;
 		this.langManager = langManager;
@@ -43,6 +46,7 @@ public class ReloadCommandHandler {
 		this.taskManager = taskManager;
 		this.placedBlockManager = placedBlockManager;
 		this.selfTaskRewardManager = selfTaskRewardManager;
+		this.promoterTaskRewardManager = promoterTaskRewardManager;
 	}
 
 	public void handleReload(CommandSender sender) {
@@ -60,6 +64,7 @@ public class ReloadCommandHandler {
 		taskManager.reload();
 		placedBlockManager.reload();
 		selfTaskRewardManager.reload();
+		promoterTaskRewardManager.reload();
 
 		langManager.sendMessage(sender, "reload-success");
 	}

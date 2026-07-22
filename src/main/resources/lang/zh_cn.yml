@@ -52,6 +52,14 @@ self-task-reward:
   claim-success: "&a你领取了任务 &e%task_id% &a的奖励！"
   money-received: "&a你获得了 &e%money% &a金币。"
 
+promoter-task-reward:
+  no-reward-configured: "&c这个任务没有配置推荐者奖励。"
+  not-completed: "&c被邀请玩家还没有完成这个任务，暂时不能领取奖励。"
+  already-claimed: "&c你已经领取过这个被邀请玩家的该任务奖励了。"
+  claim-success: "&a你领取了玩家 &e%promoted% &a完成任务 &e%task_id% &a带来的推荐奖励！"
+  money-received: "&a你获得了 &e%money% &a金币。"
+  not-your-promoted-player: "&c这个玩家不是你邀请的，不能领取该奖励。"
+
 time:
   hours-minutes: "%hours%小时%minutes%分钟"
   minutes-seconds: "%minutes%分钟%seconds%秒"
@@ -66,6 +74,17 @@ gui:
   self-task-claimed-status: "&7状态：已领取"
   self-task-no-reward-status: "&c状态：未配置奖励"
   self-task-click-to-claim: "&e点击领取奖励"
+  promoter-task-reward-name: "&e任务奖励：%task_id%"
+  promoter-task-reward-lore:
+    - "&7被邀请玩家：&e%promoted%"
+    - ""
+    - "&7任务进度："
+  promoter-task-reward-condition-line: "&7- %condition_id%: &b%current%&7/&b%required%"
+  promoter-task-reward-claimable-status: "&e状态：可领取"
+  promoter-task-reward-claimed-status: "&7状态：已领取"
+  promoter-task-reward-not-completed-status: "&c状态：未完成"
+  promoter-task-reward-no-config-status: "&c状态：未配置奖励"
+  promoter-task-reward-click-to-claim: "&e点击领取奖励"
   my-code-name: "&a你的 Promotion Code"
   my-code-lore:
     - "&7你的邀请码是:"
