@@ -70,6 +70,9 @@ reload-no-permission: "&cYou do not have permission to use this command."
 gui:
   title: "&8ChadPromoter"
   filler-name: " "
+  no-rewards-name: "&cNo rewards available"
+  no-rewards-lore:
+    - "&7There are no rewards configured."
   reward-previous-page-name: "&eLast page"
   reward-next-page-name: "&eNext page"
   self-task-claimable-status: "&eStatus: Claimable"

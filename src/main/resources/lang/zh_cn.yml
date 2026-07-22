@@ -70,6 +70,9 @@ gui:
   filler-name: " "
   reward-previous-page-name: "&e上一页"
   reward-next-page-name: "&e下一页"
+  no-rewards-name: "&c没有可用奖励"
+  no-rewards-lore:
+    - "&7当前没有配置任何奖励。"
   self-task-claimable-status: "&e状态：可领取"
   self-task-claimed-status: "&7状态：已领取"
   self-task-no-reward-status: "&c状态：未配置奖励"

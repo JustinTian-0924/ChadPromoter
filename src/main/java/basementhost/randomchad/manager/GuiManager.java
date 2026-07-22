@@ -10,6 +10,7 @@ import basementhost.randomchad.taskmodule.TaskDefinition;
 import basementhost.randomchad.taskmodule.TaskManager;
 import basementhost.randomchad.taskmodule.TaskPanelType;
 import basementhost.randomchad.taskmodule.TaskProgressManager;
+import basementhost.randomchad.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -209,16 +210,16 @@ public class GuiManager {
 	public void openRewardListGui(Player promoter, UUID promotedPlayerUuid, int rewardPage, int promotedListPage) {
 		String promotedPlayerName = dataManager.getPlayerName(promotedPlayerUuid);
 
-		List<TaskDefinition> promoterTasks = taskManager.getTasksByPanel(TaskPanelType.PROMOTER);
+		List<RewardListEntry> rewardEntries = getMixedRewardEntries();
 
 		List<Integer> contentSlots = guiConfigManager.getContentSlots();
 		int itemsPerPage = contentSlots.size();
 
-		int maxPage = getMaxPage(promoterTasks.size(), itemsPerPage);
+		int maxPage = getMaxPage(rewardEntries.size(), itemsPerPage);
 		rewardPage = clampPage(rewardPage, maxPage);
 
 		int startIndex = rewardPage * itemsPerPage;
-		int endIndex = Math.min(startIndex + itemsPerPage, promoterTasks.size());
+		int endIndex = Math.min(startIndex + itemsPerPage, rewardEntries.size());
 
 		ChadPromoterGuiHolder holder = new ChadPromoterGuiHolder(
 				ChadPromoterGuiHolder.GuiType.REWARD_LIST,
@@ -237,21 +238,31 @@ public class GuiManager {
 
 		holder.setInventory(inventory);
 
-		if (promoterTasks.isEmpty()) {
+		if (rewardEntries.isEmpty()) {
 			inventory.setItem(13, createItem(
 					Material.BARRIER,
-					langManager.getRawMessage("gui.self-task-no-tasks-name"),
-					langManager.getRawMessageList("gui.self-task-no-tasks-lore", Map.of())
+					langManager.getRawMessage("gui.no-rewards-name"),
+					langManager.getRawMessageList("gui.no-rewards-lore", Map.of())
 			));
 		} else {
 			for (int index = startIndex; index < endIndex; index++) {
-				TaskDefinition taskDefinition = promoterTasks.get(index);
+				RewardListEntry entry = rewardEntries.get(index);
 				int slot = contentSlots.get(index - startIndex);
 
-				inventory.setItem(
-						slot,
-						createPromoterTaskRewardItem(promoter, promotedPlayerUuid, taskDefinition)
-				);
+				if (entry.getType() == RewardEntryType.PLAYTIME_REWARD) {
+					inventory.setItem(
+							slot,
+							createPlaytimeRewardItem(promoter, promotedPlayerUuid, entry.getRewardDefinition())
+					);
+					continue;
+				}
+
+				if (entry.getType() == RewardEntryType.TASK_REWARD) {
+					inventory.setItem(
+							slot,
+							createPromoterTaskRewardItem(promoter, promotedPlayerUuid, entry.getTaskDefinition())
+					);
+				}
 			}
 		}
 
@@ -269,7 +280,7 @@ public class GuiManager {
 				List.of()
 		));
 
-		if (endIndex < promoterTasks.size()) {
+		if (endIndex < rewardEntries.size()) {
 			inventory.setItem(guiConfigManager.getInt("reward-list.next-page.slot", 26), createItem(
 					Material.ARROW,
 					langManager.getRawMessage("gui.reward-next-page-name"),
@@ -303,7 +314,7 @@ public class GuiManager {
 	}
 
 	public void claimRewardFromGui(Player promoter, UUID promotedPlayerUuid, int page, int parentPage, int clickedSlot) {
-		List<TaskDefinition> promoterTasks = taskManager.getTasksByPanel(TaskPanelType.PROMOTER);
+		List<RewardListEntry> rewardEntries = getMixedRewardEntries();
 
 		int contentSlotIndex = guiConfigManager.getContentSlotIndex(clickedSlot);
 
@@ -312,21 +323,123 @@ public class GuiManager {
 		}
 
 		List<Integer> contentSlots = guiConfigManager.getContentSlots();
-		int taskIndex = page * contentSlots.size() + contentSlotIndex;
+		int rewardIndex = page * contentSlots.size() + contentSlotIndex;
 
-		if (taskIndex < 0 || taskIndex >= promoterTasks.size()) {
+		if (rewardIndex < 0 || rewardIndex >= rewardEntries.size()) {
 			return;
 		}
 
-		TaskDefinition taskDefinition = promoterTasks.get(taskIndex);
+		RewardListEntry entry = rewardEntries.get(rewardIndex);
 
-		promoterTaskRewardManager.claimReward(
-				promoter,
-				promotedPlayerUuid,
-				taskDefinition.getId()
-		);
+		if (entry.getType() == RewardEntryType.PLAYTIME_REWARD) {
+			claimPlaytimeRewardFromGui(
+					promoter,
+					promotedPlayerUuid,
+					entry.getRewardDefinition()
+			);
+		}
+
+		if (entry.getType() == RewardEntryType.TASK_REWARD) {
+			promoterTaskRewardManager.claimReward(
+					promoter,
+					promotedPlayerUuid,
+					entry.getTaskDefinition().getId()
+			);
+		}
 
 		openRewardListGui(promoter, promotedPlayerUuid, page, parentPage);
+	}
+
+	private List<RewardListEntry> getMixedRewardEntries() {
+		List<RewardListEntry> entries = new ArrayList<>();
+
+		for (RewardDefinition rewardDefinition : rewardManager.getRewards()) {
+			entries.add(RewardListEntry.playtimeReward(rewardDefinition));
+		}
+
+		for (TaskDefinition taskDefinition : taskManager.getTasksByPanel(TaskPanelType.PROMOTER)) {
+			entries.add(RewardListEntry.taskReward(taskDefinition));
+		}
+
+		return entries;
+	}
+
+	private ItemStack createPlaytimeRewardItem(Player promoter, UUID promotedPlayerUuid, RewardDefinition reward) {
+		long promotedPlaytimeSeconds = playtimeManager.getPlaytimeSeconds(promotedPlayerUuid);
+
+		boolean claimed = dataManager.hasClaimedReward(
+				promoter.getUniqueId(),
+				promotedPlayerUuid,
+				reward.getId()
+		);
+
+		boolean unlocked = rewardManager.isUnlocked(
+				reward,
+				promotedPlayerUuid,
+				promotedPlaytimeSeconds
+		);
+
+		List<String> lore = new ArrayList<>(
+				langManager.getRawMessageList(reward.getLoreLangKey(), Map.of(
+						"%current_playtime%", TimeUtil.formatSeconds(langManager, promotedPlaytimeSeconds),
+						"%required_playtime%", TimeUtil.formatSeconds(langManager, reward.getRequiredPlaytimeSeconds())
+				))
+		);
+
+		if (claimed) {
+			lore.addAll(langManager.getRawMessageList("gui.reward-claimed-lore", Map.of()));
+		} else if (unlocked) {
+			lore.addAll(langManager.getRawMessageList("gui.reward-available-lore", Map.of()));
+		} else {
+			lore.addAll(langManager.getRawMessageList("gui.reward-locked-lore", Map.of(
+					"%current_playtime%", TimeUtil.formatSeconds(langManager, promotedPlaytimeSeconds),
+					"%required_playtime%", TimeUtil.formatSeconds(langManager, reward.getRequiredPlaytimeSeconds())
+			)));
+		}
+
+		Material material = reward.getMaterial();
+
+		if (claimed) {
+			material = Material.BARRIER;
+		} else if (!unlocked) {
+			material = Material.GRAY_DYE;
+		}
+
+		return createItem(
+				material,
+				langManager.getRawMessage(reward.getDisplayNameLangKey()),
+				lore
+		);
+	}
+
+	private void claimPlaytimeRewardFromGui(Player promoter, UUID promotedPlayerUuid, RewardDefinition reward) {
+		long promotedPlaytimeSeconds = playtimeManager.getPlaytimeSeconds(promotedPlayerUuid);
+
+		RewardManager.ClaimResult result = rewardManager.claimReward(
+				promoter.getUniqueId(),
+				promotedPlayerUuid,
+				reward,
+				promotedPlaytimeSeconds
+		);
+
+		if (result == RewardManager.ClaimResult.SUCCESS) {
+			langManager.sendMessage(promoter, "reward.claim-success");
+			return;
+		}
+
+		if (result == RewardManager.ClaimResult.ALREADY_CLAIMED) {
+			langManager.sendMessage(promoter, "reward.already-claimed");
+			return;
+		}
+
+		if (result == RewardManager.ClaimResult.NOT_UNLOCKED) {
+			langManager.sendMessage(promoter, "reward.not-unlocked");
+			return;
+		}
+
+		if (result == RewardManager.ClaimResult.VAULT_UNAVAILABLE) {
+			langManager.sendMessage(promoter, "reward.vault-unavailable");
+		}
 	}
 
 	private ItemStack createPromoterTaskRewardItem(Player promoter, UUID promotedPlayerUuid, TaskDefinition taskDefinition) {
@@ -633,5 +746,55 @@ public class GuiManager {
 		}
 
 		return Math.min(page, maxPage);
+	}
+
+	private enum RewardEntryType {
+		PLAYTIME_REWARD,
+		TASK_REWARD
+	}
+
+	private static class RewardListEntry {
+
+		private final RewardEntryType type;
+		private final RewardDefinition rewardDefinition;
+		private final TaskDefinition taskDefinition;
+
+		private RewardListEntry(
+				RewardEntryType type,
+				RewardDefinition rewardDefinition,
+				TaskDefinition taskDefinition
+		) {
+			this.type = type;
+			this.rewardDefinition = rewardDefinition;
+			this.taskDefinition = taskDefinition;
+		}
+
+		public static RewardListEntry playtimeReward(RewardDefinition rewardDefinition) {
+			return new RewardListEntry(
+					RewardEntryType.PLAYTIME_REWARD,
+					rewardDefinition,
+					null
+			);
+		}
+
+		public static RewardListEntry taskReward(TaskDefinition taskDefinition) {
+			return new RewardListEntry(
+					RewardEntryType.TASK_REWARD,
+					null,
+					taskDefinition
+			);
+		}
+
+		public RewardEntryType getType() {
+			return type;
+		}
+
+		public RewardDefinition getRewardDefinition() {
+			return rewardDefinition;
+		}
+
+		public TaskDefinition getTaskDefinition() {
+			return taskDefinition;
+		}
 	}
 }
